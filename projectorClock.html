@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Projector clock</title>
+	<style>
+		#clockValue {
+			font-size: 90pt;
+		}
+
+		.hide {
+			display: none !important;
+		}
+
+		.lightcard {
+			color: black !important;
+			background-color: #ddd !important;
+		}
+
+		.darkcard {
+			color: #eee !important;
+			background-color: #333 !important;
+		}
+	</style>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	<!-- Popper JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script>
+		"use strict";
+
+		//debugger;
+
+		let clockUpdateLoop;
+		let isShowSeconds;
+
+		// Source: https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
+		function pad(num, size) {
+			var s = num + "";
+			while (s.length < size) s = "0" + s;
+			return s;
+		}
+
+		function updateClock() {
+			let d = new Date();
+			let timeString = pad(d.getHours(), 2) + ":"
+				+ pad(d.getMinutes(), 2);
+			if (isShowSeconds) {
+				timeString += ":" + pad(d.getSeconds(), 2);
+			}
+
+			$("#clockValue")[0].innerText = timeString;
+		}
+
+		function setClockFontsize(points) {
+			$("#clockValue")[0].style.fontSize = `${points}pt`;
+		}
+
+		function startClock() {
+			stopClock();
+			clockUpdateLoop = setInterval(updateClock, 200);
+		}
+
+		function stopClock() {
+			if (clockUpdateLoop != null) {
+				clearInterval(clockUpdateLoop);
+				clockUpdateLoop = null;
+			}
+		}
+
+		function showSeconds() {
+			isShowSeconds = true;
+		}
+
+		function hideSeconds() {
+			isShowSeconds = false;
+		}
+
+		function showNotes(style) {
+			switch (style) {
+				case "light": {
+					$("#notesCard")[0].classList.add("lightcard");
+					$("#notesCard")[0].classList.remove("darkcard");
+					break;
+				}
+				case "dark": {
+					$("#notesCard")[0].classList.add("darkcard");
+					$("#notesCard")[0].classList.remove("lightcard");
+					break;
+				}
+
+				default: {
+
+				}
+			}
+
+			$("#notesComponent")[0].classList.remove("hide");
+		}
+
+		function hideNotes() {
+			$("#notesComponent")[0].classList.add("hide");
+		}
+
+		function showVoorbladNotes(style) {
+			switch (style) {
+				case "light": {
+					$("#voorbladNotesCard")[0].classList.add("lightcard");
+					$("#voorbladNotesCard")[0].classList.remove("darkcard");
+					break;
+				}
+				case "dark": {
+					$("#voorbladNotesCard")[0].classList.add("darkcard");
+					$("#voorbladNotesCard")[0].classList.remove("lightcard");
+					break;
+				}
+
+				default: {
+
+				}
+			}
+
+			$("#voorbladNotesComponent")[0].classList.remove("hide");
+		}
+
+		function hideVoorbladNotes() {
+			$("#voorbladNotesComponent")[0].classList.add("hide");
+		}
+
+		function getNotes() {
+			return $("#notes")[0].innerHTML;
+		}
+
+		function setNotes(value) {
+			$("#notes")[0].innerHTML = value;
+		}
+
+		$(document).ready(function () {
+			clockUpdateLoop = null;
+			isShowSeconds = false;
+			startClock();
+			hideVoorbladNotes();
+		});
+	</script>
+</head>
+
+<body style="background-color:black;color:#eee;font-size:20px;">
+	<div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
+		display:flex;flex-flow:row nowrap;justify-content:center;">
+		<div style="display:flex;flex-flow:column nowrap; justify-content:center;">
+			<div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+			margin-bottom:10px;">
+				<div style="display:block;flex:0 1 auto;" id="clockValue"></div>
+			</div>
+			<div id="voorbladNotesComponent"
+				style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
+				<div style="display:block;flex:0 1 auto;max-width:60vw;" class="card lightcard" id="voorbladNotesCard">
+					<div class="card-body" id="voorbladNotes" style="font-size: 16px;">
+						<ol>
+							<li>
+								Schrijf je naam en studentnummer op elk oplossingsblad. <strong>Begin elke opgave op een
+									nieuw blad.</strong> Bij het inleveren moet je elke opgave op een aparte stapel
+								leggen.
+							</li>
+							<li>
+								Schrijf duidelijk en leesbaar, zonder gekrabbel. Onleesbaar handschrift kan niet
+								nagekeken worden. Structureer je antwoord goed en leg je redenering goed uit.
+							</li>
+							<li>
+								Er zijn drie opgaven. Het resultaat telt voor 30% van het eindcijfer.
+							</li>
+							<li>
+								Het gebruik van elektronische hulpmiddelen (behalve een rekenmachine) is niet
+								toegestaan.
+							</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+
+			<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+				margin-top:10px;">
+				<div style="display:block;flex:0 1 auto;max-width:50vw;" class="card darkcard" id="notesCard">
+					<div class="card-body" id="notes">
+						<!--Nogmaals:
+						<ul>
+							<li>
+								Tijd tot <strong>19:30</strong> (voor extra tijd: tot 20:00).
+							</li>
+							<li>
+								Elke opgave op een nieuw tentamenblad.
+							</li>
+							<li>
+								Geen apparaten behalve rekenmachine.
+							</li>
+							<li>
+								In de laatste 30 minuten blijft iedereen zitten.
+							</li>
+							<li>
+								Zet je telefoon op stil, en stop het in je rugzak.
+							</li>
+							<li>
+								Maak je tafel en stoel schoon nadat je klaar bent met het deeltentamen.
+							</li>
+							<li>
+								Je mag dictaat, aantekeningen, en elk ander papieren materiaal gebruiken, maar je kan
+								alles doen zonder.
+							</li>
+							<li>
+								Als je recht hebt op extra tijd, schrijf dan 'extra tijd' op je tentamenblad.
+							</li>
+						</ul>
+						Veel succes!
+						-->
+						Tot 19:30 (+30 min voor extra tijd)
+					</div>
+				</div>
+			</div>
+		</div>
+</body>
+
+</html>
