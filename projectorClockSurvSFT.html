@@ -4,7 +4,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Projector clock</title>
+	<title>SFT Exam Projector Clock</title>
 	<style>
 		#clockValue {
 			font-size: 140pt;
@@ -43,12 +43,35 @@
 
 		let clockUpdateLoop;
 		let isShowSeconds;
+		let clockEvents;
+		clockEvents = {};
+		
+		let lastEventCheckTime = "";
 
 		// Source: https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
 		function pad(num, size) {
 			var s = num + "";
 			while (s.length < size) s = "0" + s;
 			return s;
+		}
+		
+		function checkForClockEvents() {
+			let d = new Date();
+			let timeString = pad(d.getHours(), 2) + ":"
+				+ pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
+			let eventEntries = Object.entries(clockEvents).sort((a, b) => (a > b) ? 1 : ((a < b) ? -1 : 0));
+			let i = 0;
+			for (; i < eventEntries.length; i++) {
+				if (eventEntries[i][0] > lastEventCheckTime)
+					break;				
+			}
+			
+			for (; i < eventEntries.length; i++) {
+				if (eventEntries[i][0] > timeString)
+					break;
+				eventEntries[i][1]();
+			}
+			lastEventCheckTime = timeString;
 		}
 
 		function updateClock() {
@@ -60,6 +83,7 @@
 			}
 
 			$("#clockValue")[0].innerText = timeString;
+			checkForClockEvents();
 		}
 
 		function setClockFontsize(points) {
@@ -148,6 +172,10 @@
 			clockUpdateLoop = null;
 			isShowSeconds = false;
 			startClock();
+			clockEvents["13:29:30"] = function() {showSeconds();};
+			clockEvents["13:30:00"] = function() {hideSeconds();};
+			clockEvents["13:32:00"] = function() {hideVoorbladNotes();};
+			
 			//hideVoorbladNotes();
 		});
 	</script>
@@ -211,7 +239,7 @@
 								Put your phone on silent.
 							</li>
 							<li>
-								Laptop/tablet allowed for consulting open book material.
+								Laptop/tablet allowed for consulting open book material (book, notes, lectures).
 							</li>
 							<li>
 								Exam starts at 13:30 and ends at 16:30.
@@ -223,7 +251,7 @@
 								Extra time? You should be in KBG Cosmos.
 							</li>
 						</ul>
-						Good luck!
+						<span style="cursor:none;">Good luck!</span>
 					</div>
 				</div>
 			</div>
