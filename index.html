@@ -53,8 +53,6 @@ let defaultVoorbladNotes = `\
 			
 **Veel succes!**`;
 
-let currentVoorbladNotesEditHeight = 10;
-
 // Source: https://www.w3schools.com/js/js_cookies.asp
 // Modified
 function setCookie(cname, cvalue, exdays) {
@@ -255,7 +253,7 @@ $(document).ready(function () {
 	trySetVoorbladNotesContent(voorbladNotesContent);
 	
 	showVoorbladNotes();
-	//hideVoorbladNotes();
+	showNotes();
 	
 	$("#voorbladNotesDisplay").click(function() {
 		startEditVoorbladNotes();
@@ -271,7 +269,6 @@ $(document).ready(function () {
 	});
 	
 	$("body")[0].addEventListener("keydown", function (e) {
-		//console.log(`key is ${e.key}`);
 		if (!isEditing) {
 			if (e.key === "f" ) {
 				$("body")[0].requestFullscreen();
@@ -323,14 +320,10 @@ function trySetVoorbladNotesContent(val) {
 // Source: https://gomakethings.com/automatically-expand-a-textarea-as-the-user-types-using-vanilla-javascript/
 // Modified
 var autoExpand = function (field) {
-	//return;
-	//field.style.minHeight = field.style.height;
-
 	$("#afterVoorbladNotesEditContent")[0].style.height = field.style.height;
 
 	// Reset field height
 	field.style.height = 'inherit';
-	//field.style.height = `${currentVoorbladNotesEditHeight - 10}px`;
 
 	// Get the computed styles for the element
 	var computed = window.getComputedStyle(field);
@@ -344,7 +337,6 @@ var autoExpand = function (field) {
 
 	field.style.height = height + 'px';
 	$("#afterVoorbladNotesEditContent")[0].style.height = "0px";
-	//field.style.minHeight = "";
 };
 	</script>
 </head>
@@ -362,36 +354,6 @@ var autoExpand = function (field) {
 				margin-top:10px;">
 				<div style="display:block;flex:0 1 auto;max-width:50vw;" class="card darkcard" id="notesCard">
 					<div class="card-body" id="notes">
-						<!--Nogmaals:
-						<ul>
-							<li>
-								Tijd tot <strong>19:30</strong> (voor extra tijd: tot 20:00).
-							</li>
-							<li>
-								Elke opgave op een nieuw tentamenblad.
-							</li>
-							<li>
-								Geen apparaten behalve rekenmachine.
-							</li>
-							<li>
-								In de laatste 30 minuten blijft iedereen zitten.
-							</li>
-							<li>
-								Zet je telefoon op stil, en stop het in je rugzak.
-							</li>
-							<li>
-								Maak je tafel en stoel schoon nadat je klaar bent met het deeltentamen.
-							</li>
-							<li>
-								Je mag dictaat, aantekeningen, en elk ander papieren materiaal gebruiken, maar je kan
-								alles doen zonder.
-							</li>
-							<li>
-								Als je recht hebt op extra tijd, schrijf dan 'extra tijd' op je tentamenblad.
-							</li>
-						</ul>
-						Veel succes!
-						-->
 						Examen eindigt om 16:30 (+30 min voor extra tijd)
 					</div>
 				</div>
@@ -420,23 +382,7 @@ var autoExpand = function (field) {
 							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
 						</div>
 						<div id="voorbladNotesDisplay">
-							<h1>Mechanica eindtentamen</h1>
-							<ul>
-								<li>
-									Zet je telefoon op stil.
-								</li>
-								<li>
-									Het examen begint om 13:30 en eindigt om 16:30, om 17:00 voor extra tijd.
-								</li>
-								<li>
-									Elke opgave op een nieuw tentamenblad.
-								</li>
-								<li>
-									In de laatste 30 minuten blijft iedereen zitten.
-								</li>
-							</ul>
-							Veel succes!
-							<!--<span style="cursor:none;">Good luck!</span>-->
+							Notes couldn't be loaded (have you enabled JavaScript?)
 						</div>
 					</div>
 				</div>
