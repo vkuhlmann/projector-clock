@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>SFT Exam Projector Clock</title>
+	<style>
+		#clockValue {
+			font-size: 140pt;
+		}
+
+		.hide {
+			display: none !important;
+		}
+
+		.lightcard {
+			color: black !important;
+			background-color: #ddd !important;
+		}
+
+		.darkcard {
+			color: #eee !important;
+			background-color: #333 !important;
+		}
+	</style>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	<!-- Popper JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	
+	<script>
+"use strict";
+
+let voorbladNotesContent;
+
+let defaultVoorbladNotes = `\
+# Mechanica eindtentamen
+- Zet je telefoon op stil.
+- Het examen begint om 13:30 en eindigt om 16:30, om 17:00 voor extra tijd.
+- Elke opgave op een nieuw tentamenblad.
+- In de laatste 30 minuten blijft iedereen zitten.
+			
+**Veel succes!**`;
+
+let currentVoorbladNotesEditHeight = 10;
+
+// Source: https://www.w3schools.com/js/js_cookies.asp
+// Modified
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires="+d.toUTCString();
+  let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
+  //console.log("setting cookie: " + cookieString);
+  document.cookie = cookieString;
+  //cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
+}
+
+// Source: https://www.w3schools.com/js/js_cookies.asp
+function getCookie(cname) {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+	  //console.log("decoding " + c.substring(name.length, c.length));
+      return window.atob(c.substring(name.length, c.length));
+    }
+  }
+  return "";
+}
+
+//debugger;
+
+let clockUpdateLoop;
+let isShowSeconds;
+let clockEvents;
+clockEvents = {};
+
+let isEditing = false;
+let lastEventCheckTime = "";
+let voorbladNotesVisible = false;
+let notesVisible = true;
+
+// Source: https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
+function pad(num, size) {
+	var s = num + "";
+	while (s.length < size) s = "0" + s;
+	return s;
+}
+
+function checkForClockEvents() {
+	let d = new Date();
+	let timeString = pad(d.getHours(), 2) + ":"
+		+ pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
+	let eventEntries = Object.entries(clockEvents).sort((a, b) => (a > b) ? 1 : ((a < b) ? -1 : 0));
+	let i = 0;
+	for (; i < eventEntries.length; i++) {
+		if (eventEntries[i][0] > lastEventCheckTime)
+			break;				
+	}
+	
+	for (; i < eventEntries.length; i++) {
+		if (eventEntries[i][0] > timeString)
+			break;
+		eventEntries[i][1]();
+	}
+	lastEventCheckTime = timeString;
+}
+
+function updateClock() {
+	let d = new Date();
+	let timeString = pad(d.getHours(), 2) + ":"
+		+ pad(d.getMinutes(), 2);
+	if (isShowSeconds) {
+		timeString += ":" + pad(d.getSeconds(), 2);
+	}
+
+	$("#clockValue")[0].innerText = timeString;
+	checkForClockEvents();
+}
+
+function setClockFontsize(points) {
+	$("#clockValue")[0].style.fontSize = `${points}pt`;
+}
+
+function startClock() {
+	stopClock();
+	clockUpdateLoop = setInterval(updateClock, 200);
+}
+
+function stopClock() {
+	if (clockUpdateLoop != null) {
+		clearInterval(clockUpdateLoop);
+		clockUpdateLoop = null;
+	}
+}
+
+function showSeconds() {
+	isShowSeconds = true;
+}
+
+function hideSeconds() {
+	isShowSeconds = false;
+}
+
+function showNotes(style) {
+	switch (style) {
+		case "light": {
+			$("#notesCard")[0].classList.add("lightcard");
+			$("#notesCard")[0].classList.remove("darkcard");
+			break;
+		}
+		case "dark": {
+			$("#notesCard")[0].classList.add("darkcard");
+			$("#notesCard")[0].classList.remove("lightcard");
+			break;
+		}
+
+		default: {
+
+		}
+	}
+
+	$("#notesComponent")[0].classList.remove("hide");
+	notesVisible = true;
+}
+
+function hideNotes() {
+	$("#notesComponent")[0].classList.add("hide");
+	notesVisible = false;
+}
+
+function showVoorbladNotes(style) {
+	switch (style) {
+		case "light": {
+			$("#voorbladNotesCard")[0].classList.add("lightcard");
+			$("#voorbladNotesCard")[0].classList.remove("darkcard");
+			break;
+		}
+		case "dark": {
+			$("#voorbladNotesCard")[0].classList.add("darkcard");
+			$("#voorbladNotesCard")[0].classList.remove("lightcard");
+			break;
+		}
+
+		default: {
+
+		}
+	}
+
+	$("#voorbladNotesComponent")[0].classList.remove("hide");
+	voorbladNotesVisible = true;
+}
+
+function hideVoorbladNotes() {
+	$("#voorbladNotesComponent")[0].classList.add("hide");
+	voorbladNotesVisible = false;
+}
+
+function toggleVoorbladNotes() {
+	if (voorbladNotesVisible)
+		hideVoorbladNotes();
+	else
+		showVoorbladNotes();
+}
+
+
+function toggleNotes() {
+	if (notesVisible)
+		hideNotes();
+	else
+		showNotes();
+}
+
+function getNotes() {
+	return $("#notes")[0].innerHTML;
+}
+
+function setNotes(value) {
+	$("#notes")[0].innerHTML = value;
+}
+
+$(document).ready(function () {
+	clockUpdateLoop = null;
+	isShowSeconds = false;
+	clockEvents["13:29:30"] = function() {showSeconds();};
+	clockEvents["13:30:00"] = function() {hideSeconds();};
+	clockEvents["13:32:00"] = function() {hideVoorbladNotes();};
+	clockEvents["22:00:00"] = function() {showVoorbladNotes();};
+	
+	voorbladNotesContent = defaultVoorbladNotes;
+	try {
+		let notes2Content = getCookie("notes2");
+		if (notes2Content !== "")
+			voorbladNotesContent = notes2Content;
+	} catch(err) {
+		console.log("Error trying to read notes2");
+	}
+		
+	trySetVoorbladNotesContent(voorbladNotesContent);
+	
+	showVoorbladNotes();
+	//hideVoorbladNotes();
+	
+	$("#voorbladNotesDisplay").click(function() {
+		startEditVoorbladNotes();
+	});
+	
+	$("#voorbladNotesEditContent")[0].addEventListener("input", function() {
+		autoExpand($("#voorbladNotesEditContent")[0]);
+		trySetVoorbladNotesContent($("#voorbladNotesEditContent")[0].value);
+	});
+	
+	$("#voorbladNotesEditClose")[0].addEventListener("click", function(e) {
+		stopEditVoorbladNotes();
+	});
+	
+	$("body")[0].addEventListener("keydown", function (e) {
+		//console.log(`key is ${e.key}`);
+		if (!isEditing) {
+			if (e.key === "f" ) {
+				$("body")[0].requestFullscreen();
+				e.preventDefault();
+				e.stopPropagation();
+			} else if (e.key === "2") {
+				toggleVoorbladNotes();
+				e.preventDefault();
+				e.stopPropagation();
+			} else if (e.key === "1") {
+				toggleNotes();
+				e.preventDefault();
+				e.stopPropagation();
+			} else if (e.key === "r") {
+				trySetVoorbladNotesContent(defaultVoorbladNotes);
+			}
+		}
+	});
+	
+	startClock();
+});
+
+function startEditVoorbladNotes() {
+	isEditing = true;
+	$("#voorbladNotesEditContent")[0].value = voorbladNotesContent;
+	$("#voorbladNotesEdit")[0].classList.remove("hide");
+	autoExpand($("#voorbladNotesEditContent")[0]);
+}
+
+function stopEditVoorbladNotes() {
+	$("#voorbladNotesEdit")[0].classList.add("hide");
+	//console.log($("#voorbladNotesEdit")[0].classList);
+	isEditing = false;
+}
+
+function trySetVoorbladNotesContent(val) {
+	try {
+		let newDisplay = marked(val);
+		voorbladNotesContent = val;
+		$("#voorbladNotesDisplay")[0].innerHTML = newDisplay;
+		
+		setCookie("notes2", voorbladNotesContent, 36500);
+		return true;
+	} catch(err) {
+		return false;
+	}		
+}
+
+// Source: https://gomakethings.com/automatically-expand-a-textarea-as-the-user-types-using-vanilla-javascript/
+// Modified
+var autoExpand = function (field) {
+	//return;
+	//field.style.minHeight = field.style.height;
+
+	$("#afterVoorbladNotesEditContent")[0].style.height = field.style.height;
+
+	// Reset field height
+	field.style.height = 'inherit';
+	//field.style.height = `${currentVoorbladNotesEditHeight - 10}px`;
+
+	// Get the computed styles for the element
+	var computed = window.getComputedStyle(field);
+
+	// Calculate the height
+	var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+				 + parseInt(computed.getPropertyValue('padding-top'), 10)
+				 + field.scrollHeight
+				 + parseInt(computed.getPropertyValue('padding-bottom'), 10)
+				 + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+
+	field.style.height = height + 'px';
+	$("#afterVoorbladNotesEditContent")[0].style.height = "0px";
+	//field.style.minHeight = "";
+};
+	</script>
+</head>
+
+<body style="background-color:black;color:#eee;font-size:30px;">
+	<div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
+		display:flex;flex-flow:row nowrap;justify-content:center;">
+		<div style="display:flex;flex-flow:column nowrap; justify-content:center;">
+			<div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+			margin-bottom:10px;">
+				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue"></div>
+			</div>
+			
+			<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+				margin-top:10px;">
+				<div style="display:block;flex:0 1 auto;max-width:50vw;" class="card darkcard" id="notesCard">
+					<div class="card-body" id="notes">
+						<!--Nogmaals:
+						<ul>
+							<li>
+								Tijd tot <strong>19:30</strong> (voor extra tijd: tot 20:00).
+							</li>
+							<li>
+								Elke opgave op een nieuw tentamenblad.
+							</li>
+							<li>
+								Geen apparaten behalve rekenmachine.
+							</li>
+							<li>
+								In de laatste 30 minuten blijft iedereen zitten.
+							</li>
+							<li>
+								Zet je telefoon op stil, en stop het in je rugzak.
+							</li>
+							<li>
+								Maak je tafel en stoel schoon nadat je klaar bent met het deeltentamen.
+							</li>
+							<li>
+								Je mag dictaat, aantekeningen, en elk ander papieren materiaal gebruiken, maar je kan
+								alles doen zonder.
+							</li>
+							<li>
+								Als je recht hebt op extra tijd, schrijf dan 'extra tijd' op je tentamenblad.
+							</li>
+						</ul>
+						Veel succes!
+						-->
+						Examen eindigt om 16:30 (+30 min voor extra tijd)
+					</div>
+				</div>
+			</div>
+			
+			<div id="voorbladNotesComponent"
+				style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
+				<div style="display:block;flex:0 1 auto;max-width:60vw;" class="card lightcard" id="voorbladNotesCard">
+					<div class="card-body" id="voorbladNotes" style="font-size:30px;">
+						<div id="voorbladNotesEdit" class="hide">
+							<div class="card">
+								<div class="card-header" style="display:flex;flex-flow:row nowrap;" style="font-size:25px;">
+									<div style="flex:1 0 auto;">
+										<label for="voorbladNotesEditContent">Bewerken</label>
+									</div>
+									<div style="flex:0 1 auto;">
+										<button type="button" class="btn btn-dark"
+										id="voorbladNotesEditClose">Bewerken sluiten</button>
+									</div>
+								</div>
+								<div class="card-body">								
+									<textarea style="min-width:30vw;display:block;" class="form-control" id="voorbladNotesEditContent"></textarea>
+									<div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
+								</div>
+							</div>
+							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+						</div>
+						<div id="voorbladNotesDisplay">
+							<h1>Mechanica eindtentamen</h1>
+							<ul>
+								<li>
+									Zet je telefoon op stil.
+								</li>
+								<li>
+									Het examen begint om 13:30 en eindigt om 16:30, om 17:00 voor extra tijd.
+								</li>
+								<li>
+									Elke opgave op een nieuw tentamenblad.
+								</li>
+								<li>
+									In de laatste 30 minuten blijft iedereen zitten.
+								</li>
+							</ul>
+							Veel succes!
+							<!--<span style="cursor:none;">Good luck!</span>-->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</body>
+
+</html>
