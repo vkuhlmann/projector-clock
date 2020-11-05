@@ -42,7 +42,9 @@
 	<script>
 "use strict";
 
-let voorbladNotesContent = `\
+let voorbladNotesContent;
+
+let defaultVoorbladNotes = `\
 # Mechanica eindtentamen
 - Zet je telefoon op stil.
 - Het examen begint om 13:30 en eindigt om 16:30, om 17:00 voor extra tijd.
@@ -50,6 +52,8 @@ let voorbladNotesContent = `\
 - In de laatste 30 minuten blijft iedereen zitten.
 			
 **Veel succes!**`;
+
+let currentVoorbladNotesEditHeight = 10;
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
 // Modified
@@ -89,6 +93,8 @@ clockEvents = {};
 
 let isEditing = false;
 let lastEventCheckTime = "";
+let voorbladNotesVisible = false;
+let notesVisible = true;
 
 // Source: https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
 function pad(num, size) {
@@ -171,10 +177,12 @@ function showNotes(style) {
 	}
 
 	$("#notesComponent")[0].classList.remove("hide");
+	notesVisible = true;
 }
 
 function hideNotes() {
 	$("#notesComponent")[0].classList.add("hide");
+	notesVisible = false;
 }
 
 function showVoorbladNotes(style) {
@@ -196,14 +204,27 @@ function showVoorbladNotes(style) {
 	}
 
 	$("#voorbladNotesComponent")[0].classList.remove("hide");
+	voorbladNotesVisible = true;
 }
 
 function hideVoorbladNotes() {
 	$("#voorbladNotesComponent")[0].classList.add("hide");
+	voorbladNotesVisible = false;
 }
 
 function toggleVoorbladNotes() {
+	if (voorbladNotesVisible)
+		hideVoorbladNotes();
+	else
+		showVoorbladNotes();
+}
 
+
+function toggleNotes() {
+	if (notesVisible)
+		hideNotes();
+	else
+		showNotes();
 }
 
 function getNotes() {
@@ -217,12 +238,12 @@ function setNotes(value) {
 $(document).ready(function () {
 	clockUpdateLoop = null;
 	isShowSeconds = false;
-	startClock();
 	clockEvents["13:29:30"] = function() {showSeconds();};
 	clockEvents["13:30:00"] = function() {hideSeconds();};
 	clockEvents["13:32:00"] = function() {hideVoorbladNotes();};
 	clockEvents["22:00:00"] = function() {showVoorbladNotes();};
 	
+	voorbladNotesContent = defaultVoorbladNotes;
 	try {
 		let notes2Content = getCookie("notes2");
 		if (notes2Content !== "")
@@ -233,6 +254,7 @@ $(document).ready(function () {
 		
 	trySetVoorbladNotesContent(voorbladNotesContent);
 	
+	showVoorbladNotes();
 	//hideVoorbladNotes();
 	
 	$("#voorbladNotesDisplay").click(function() {
@@ -253,9 +275,23 @@ $(document).ready(function () {
 		if (!isEditing) {
 			if (e.key === "f" ) {
 				$("body")[0].requestFullscreen();
+				e.preventDefault();
+				e.stopPropagation();
+			} else if (e.key === "2") {
+				toggleVoorbladNotes();
+				e.preventDefault();
+				e.stopPropagation();
+			} else if (e.key === "1") {
+				toggleNotes();
+				e.preventDefault();
+				e.stopPropagation();
+			} else if (e.key === "r") {
+				trySetVoorbladNotesContent(defaultVoorbladNotes);
 			}
 		}
-	}, true);
+	});
+	
+	startClock();
 });
 
 function startEditVoorbladNotes() {
@@ -287,10 +323,14 @@ function trySetVoorbladNotesContent(val) {
 // Source: https://gomakethings.com/automatically-expand-a-textarea-as-the-user-types-using-vanilla-javascript/
 // Modified
 var autoExpand = function (field) {
-	field.style.minHeight = field.style.height;
+	//return;
+	//field.style.minHeight = field.style.height;
+
+	$("#afterVoorbladNotesEditContent")[0].style.height = field.style.height;
 
 	// Reset field height
 	field.style.height = 'inherit';
+	//field.style.height = `${currentVoorbladNotesEditHeight - 10}px`;
 
 	// Get the computed styles for the element
 	var computed = window.getComputedStyle(field);
@@ -303,7 +343,8 @@ var autoExpand = function (field) {
 				 + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
 
 	field.style.height = height + 'px';
-	field.style.minHeight = "";
+	$("#afterVoorbladNotesEditContent")[0].style.height = "0px";
+	//field.style.minHeight = "";
 };
 	</script>
 </head>
@@ -373,6 +414,7 @@ var autoExpand = function (field) {
 								</div>
 								<div class="card-body">								
 									<textarea style="min-width:30vw;display:block;" class="form-control" id="voorbladNotesEditContent"></textarea>
+									<div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
 								</div>
 							</div>
 							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
