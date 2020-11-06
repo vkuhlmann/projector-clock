@@ -23,6 +23,14 @@
 			color: #eee !important;
 			background-color: #333 !important;
 		}
+
+		.template {
+			display: none !important;
+		}
+
+		.template-staging {
+			display: none !important;
+		}
 	</style>
 
 	<!-- Latest compiled and minified CSS -->
@@ -166,6 +174,7 @@ function hideSeconds() {
 }
 
 function showNotes(style) {
+	return;
 	switch (style) {
 		case "light": {
 			$("#notesCard")[0].classList.add("lightcard");
@@ -188,6 +197,7 @@ function showNotes(style) {
 }
 
 function hideNotes() {
+	return;
 	$("#notesComponent")[0].classList.add("hide");
 	notesVisible = false;
 }
@@ -249,6 +259,51 @@ function resetNotes() {
 		setCookie("notes2", "", -1);
 }
 
+let instantiationIndex = 0;
+
+function createTemplateInstance(template, container, activeOnAdd = false) {
+    let el;
+    if (typeof (template) == "string") {
+        el = $(`#${template}`)[0].cloneNode(true);
+    } else {
+        el = template.cloneNode(true);
+    }
+
+    let modifyNodes = $("[id]", el).toArray();
+    if (el.hasAttribute("id"))
+        modifyNodes.push(el);
+
+    for (let modifyNode of modifyNodes) {
+        let origID = modifyNode.getAttribute("id");
+        modifyNode.setAttribute("data-id", origID);
+        let newID = origID + "-" + instantiationIndex.toString();
+        instantiationIndex += 1;
+        modifyNode.setAttribute("id", newID);
+        modifyNode.id = newID;
+
+        $(`[marker-end=\"url(#${origID})\"]`).attr("marker-end", `url(#${newID})`);
+        $(`[href=\"#${origID}\"]`).attr("href", `#${newID}`);
+    }
+
+    if (!activeOnAdd)
+        el.classList.add("template-staging");
+    el.classList.remove("template");
+    if (container != null)
+        container.appendChild(el);
+    return el;
+}
+
+function activateTemplateInstance(el) {
+    el.classList.remove("template-staging");
+}
+
+function createNote(content, isDark = false) {
+	let el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
+	$("[data-id=\"noteContent\"]", el)[0].innerHTML = content;
+
+	activateTemplateInstance(el);
+}
+
 $(document).ready(function () {
 	clockUpdateLoop = null;
 	isShowSeconds = false;
@@ -305,6 +360,9 @@ $(document).ready(function () {
 		}
 	});
 
+	createNote("AA");
+	createNote("BB");
+
 	updateClock();
 	startClock();
 });
@@ -322,7 +380,7 @@ function stopEditVoorbladNotes() {
 	isEditing = false;
 }
 
-function trySetVoorbladNotesContent(val, save) {
+function trySetVoorbladNotesContent(val, save = true) {
 	try {
 		let newDisplay = marked(val);
 		voorbladNotesContent = val;
@@ -364,13 +422,25 @@ var autoExpand = function (field) {
 <body style="background-color:black;color:#eee;font-size:30px;">
 	<div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
 		display:flex;flex-flow:row nowrap;justify-content:center;">
-		<div style="display:flex;flex-flow:column nowrap; justify-content:center;">
+		<div style="display:flex;flex-flow:column nowrap; justify-content:center;"
+			id="componentContainer">
+
 			<div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
 			margin-bottom:10px;">
 				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue">--:--</div>
 			</div>
 
-			<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+			<div id="noteComponent" class="template" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+				margin-top:10px;">
+				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+					class="card darkcard" id="noteCard">
+					<div class="card-body" id="noteContent">
+						Note text
+					</div>
+				</div>
+			</div>
+
+			<!--<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
 				margin-top:10px;">
 				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
 					class="card darkcard" id="notesCard">
@@ -378,7 +448,7 @@ var autoExpand = function (field) {
 						Test ends at --:--
 					</div>
 				</div>
-			</div>
+			</div>-->
 
 			<div id="voorbladNotesComponent"
 				style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
