@@ -55,13 +55,13 @@
 let voorbladNotesContent;
 
 let defaultVoorbladNotes = `\
-# Mechanica eindtentamen
-- Zet je telefoon op stil.
-- Het examen begint om 13:30 en eindigt om 16:30, om 17:00 voor extra tijd.
-- Elke opgave op een nieuw tentamenblad.
-- In de laatste 30 minuten blijft iedereen zitten.
+# Test on ... - Example notes
+- Put your phone on silent.
+- Test starts at --:-- and ends at --:--.
+- In the last 30 minutes everyone remains seated.
+- Allowed material: --.
 
-**Veel succes!**`;
+**Good luck!**`;
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
 // Modified
@@ -246,10 +246,10 @@ function setNotes(value) {
 $(document).ready(function () {
 	clockUpdateLoop = null;
 	isShowSeconds = false;
-	clockEvents["13:29:30"] = function () { showSeconds(); };
-	clockEvents["13:30:00"] = function () { hideSeconds(); };
-	clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
-	clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
+	//clockEvents["13:29:30"] = function () { showSeconds(); };
+	//clockEvents["13:30:00"] = function () { hideSeconds(); };
+	//clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
+	//clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
 
 	voorbladNotesContent = defaultVoorbladNotes;
 	try {
@@ -365,7 +365,7 @@ var autoExpand = function (field) {
 				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
 					class="card darkcard" id="notesCard">
 					<div class="card-body" id="notes">
-						Examen eindigt om 16:30 (+30 min voor extra tijd)
+						Test ends at --:--
 					</div>
 				</div>
 			</div>
