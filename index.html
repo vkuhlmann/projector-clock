@@ -298,6 +298,7 @@ $(document).ready(function () {
 		}
 	});
 
+	updateClock();
 	startClock();
 });
 
@@ -357,7 +358,7 @@ var autoExpand = function (field) {
 		<div style="display:flex;flex-flow:column nowrap; justify-content:center;">
 			<div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
 			margin-bottom:10px;">
-				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue"></div>
+				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue">--:--</div>
 			</div>
 
 			<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
