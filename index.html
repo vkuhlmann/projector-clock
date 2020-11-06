@@ -36,9 +36,19 @@
 
 	<!-- Latest compiled JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	
+
 	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-	
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-BQYYBWNWLZ"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-BQYYBWNWLZ');
+	</script>
+
 	<script>
 "use strict";
 
@@ -56,30 +66,30 @@ let defaultVoorbladNotes = `\
 // Source: https://www.w3schools.com/js/js_cookies.asp
 // Modified
 function setCookie(cname, cvalue, exdays) {
-  var d = new Date();
-  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  var expires = "expires="+d.toUTCString();
-  let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
-  //console.log("setting cookie: " + cookieString);
-  document.cookie = cookieString;
-  //cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
+	var d = new Date();
+	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+	var expires = "expires=" + d.toUTCString();
+	let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
+	//console.log("setting cookie: " + cookieString);
+	document.cookie = cookieString;
+	//cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
 }
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
 function getCookie(cname) {
-  var name = cname + "=";
-  var ca = document.cookie.split(';');
-  for(var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-	  //console.log("decoding " + c.substring(name.length, c.length));
-      return window.atob(c.substring(name.length, c.length));
-    }
-  }
-  return "";
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for (var i = 0; i < ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			//console.log("decoding " + c.substring(name.length, c.length));
+			return window.atob(c.substring(name.length, c.length));
+		}
+	}
+	return "";
 }
 
 //debugger;
@@ -109,9 +119,9 @@ function checkForClockEvents() {
 	let i = 0;
 	for (; i < eventEntries.length; i++) {
 		if (eventEntries[i][0] > lastEventCheckTime)
-			break;				
+			break;
 	}
-	
+
 	for (; i < eventEntries.length; i++) {
 		if (eventEntries[i][0] > timeString)
 			break;
@@ -236,41 +246,41 @@ function setNotes(value) {
 $(document).ready(function () {
 	clockUpdateLoop = null;
 	isShowSeconds = false;
-	clockEvents["13:29:30"] = function() {showSeconds();};
-	clockEvents["13:30:00"] = function() {hideSeconds();};
-	clockEvents["13:32:00"] = function() {hideVoorbladNotes();};
-	clockEvents["22:00:00"] = function() {showVoorbladNotes();};
-	
+	clockEvents["13:29:30"] = function () { showSeconds(); };
+	clockEvents["13:30:00"] = function () { hideSeconds(); };
+	clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
+	clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
+
 	voorbladNotesContent = defaultVoorbladNotes;
 	try {
 		let notes2Content = getCookie("notes2");
 		if (notes2Content !== "")
 			voorbladNotesContent = notes2Content;
-	} catch(err) {
+	} catch (err) {
 		console.log("Error trying to read notes2");
 	}
-		
+
 	trySetVoorbladNotesContent(voorbladNotesContent);
-	
+
 	showVoorbladNotes();
 	showNotes();
-	
-	$("#voorbladNotesDisplay").click(function() {
+
+	$("#voorbladNotesDisplay").click(function () {
 		startEditVoorbladNotes();
 	});
-	
-	$("#voorbladNotesEditContent")[0].addEventListener("input", function() {
+
+	$("#voorbladNotesEditContent")[0].addEventListener("input", function () {
 		autoExpand($("#voorbladNotesEditContent")[0]);
 		trySetVoorbladNotesContent($("#voorbladNotesEditContent")[0].value);
 	});
-	
-	$("#voorbladNotesEditClose")[0].addEventListener("click", function(e) {
+
+	$("#voorbladNotesEditClose")[0].addEventListener("click", function (e) {
 		stopEditVoorbladNotes();
 	});
-	
+
 	$("body")[0].addEventListener("keydown", function (e) {
 		if (!isEditing) {
-			if (e.key === "f" ) {
+			if (e.key === "f") {
 				$("body")[0].requestFullscreen();
 				e.preventDefault();
 				e.stopPropagation();
@@ -287,7 +297,7 @@ $(document).ready(function () {
 			}
 		}
 	});
-	
+
 	startClock();
 });
 
@@ -309,12 +319,12 @@ function trySetVoorbladNotesContent(val) {
 		let newDisplay = marked(val);
 		voorbladNotesContent = val;
 		$("#voorbladNotesDisplay")[0].innerHTML = newDisplay;
-		
+
 		setCookie("notes2", voorbladNotesContent, 36500);
 		return true;
-	} catch(err) {
+	} catch (err) {
 		return false;
-	}		
+	}
 }
 
 // Source: https://gomakethings.com/automatically-expand-a-textarea-as-the-user-types-using-vanilla-javascript/
@@ -330,10 +340,10 @@ var autoExpand = function (field) {
 
 	// Calculate the height
 	var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
-				 + parseInt(computed.getPropertyValue('padding-top'), 10)
-				 + field.scrollHeight
-				 + parseInt(computed.getPropertyValue('padding-bottom'), 10)
-				 + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+		+ parseInt(computed.getPropertyValue('padding-top'), 10)
+		+ field.scrollHeight
+		+ parseInt(computed.getPropertyValue('padding-bottom'), 10)
+		+ parseInt(computed.getPropertyValue('border-bottom-width'), 10);
 
 	field.style.height = height + 'px';
 	$("#afterVoorbladNotesEditContent")[0].style.height = "0px";
@@ -349,33 +359,37 @@ var autoExpand = function (field) {
 			margin-bottom:10px;">
 				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue"></div>
 			</div>
-			
+
 			<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
 				margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));" class="card darkcard" id="notesCard">
+				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+					class="card darkcard" id="notesCard">
 					<div class="card-body" id="notes">
 						Examen eindigt om 16:30 (+30 min voor extra tijd)
 					</div>
 				</div>
 			</div>
-			
+
 			<div id="voorbladNotesComponent"
 				style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));" class="card lightcard" id="voorbladNotesCard">
+				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+					class="card lightcard" id="voorbladNotesCard">
 					<div class="card-body" id="voorbladNotes" style="font-size:30px;">
 						<div id="voorbladNotesEdit" class="hide">
 							<div class="card">
-								<div class="card-header" style="display:flex;flex-flow:row nowrap;" style="font-size:25px;">
+								<div class="card-header" style="display:flex;flex-flow:row nowrap;"
+									style="font-size:25px;">
 									<div style="flex:1 0 auto;">
 										<label for="voorbladNotesEditContent">Bewerken</label>
 									</div>
 									<div style="flex:0 1 auto;">
-										<button type="button" class="btn btn-dark"
-										id="voorbladNotesEditClose">Bewerken sluiten</button>
+										<button type="button" class="btn btn-dark" id="voorbladNotesEditClose">Bewerken
+											sluiten</button>
 									</div>
 								</div>
-								<div class="card-body">								
-									<textarea spellcheck="false" style="min-width:30vw;display:block;" class="form-control" id="voorbladNotesEditContent"></textarea>
+								<div class="card-body">
+									<textarea spellcheck="false" style="min-width:30vw;display:block;"
+										class="form-control" id="voorbladNotesEditContent"></textarea>
 									<div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
 								</div>
 							</div>
