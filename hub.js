@@ -42,7 +42,7 @@ function onDOMReady() {
 	});
 
 	$("#voorbladNotesEditContent")[0].addEventListener("input", function () {
-		autoExpand($("#voorbladNotesEditContent")[0]);
+		autoExpand($("#voorbladNotesEditContent")[0], $("#afterVoorbladNotesEditContent")[0]);
 		trySetVoorbladNotesContent($("#voorbladNotesEditContent")[0].value);
 	});
 
@@ -71,8 +71,8 @@ function onDOMReady() {
 		}
 	});
 
-	new Note("AA");
-	new Note("BB", true);
+	new Note("noteAA", null);
+	new Note("noteBB", null, true, "BB");
 
 	updateClock();
 	startClock();

@@ -2,38 +2,38 @@
 
 // Source: https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
 function pad(num, size) {
-	var s = num + "";
-	while (s.length < size) s = "0" + s;
-	return s;
+    var s = num + "";
+    while (s.length < size) s = "0" + s;
+    return s;
 }
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
 // Modified
 function setCookie(cname, cvalue, exdays) {
-	var d = new Date();
-	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-	var expires = "expires=" + d.toUTCString();
-	let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
-	//console.log("setting cookie: " + cookieString);
-	document.cookie = cookieString;
-	//cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
+    //console.log("setting cookie: " + cookieString);
+    document.cookie = cookieString;
+    //cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
 }
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
 function getCookie(cname) {
-	var name = cname + "=";
-	var ca = document.cookie.split(';');
-	for (var i = 0; i < ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0) == ' ') {
-			c = c.substring(1);
-		}
-		if (c.indexOf(name) == 0) {
-			//console.log("decoding " + c.substring(name.length, c.length));
-			return window.atob(c.substring(name.length, c.length));
-		}
-	}
-	return "";
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            //console.log("decoding " + c.substring(name.length, c.length));
+            return window.atob(c.substring(name.length, c.length));
+        }
+    }
+    return "";
 }
 
 let instantiationIndex = 0;
@@ -78,23 +78,26 @@ function activateTemplateInstance(el) {
 
 // Source: https://gomakethings.com/automatically-expand-a-textarea-as-the-user-types-using-vanilla-javascript/
 // Modified
-var autoExpand = function (field) {
-	$("#afterVoorbladNotesEditContent")[0].style.height = field.style.height;
+var autoExpand = function (field, heightHolder) {
+    if (heightHolder != null)
+        heightHolder.style.height = field.style.height;
 
-	// Reset field height
-	field.style.height = 'inherit';
+    // Reset field height
+    field.style.height = 'inherit';
 
-	// Get the computed styles for the element
-	var computed = window.getComputedStyle(field);
+    // Get the computed styles for the element
+    var computed = window.getComputedStyle(field);
 
-	// Calculate the height
-	var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
-		+ parseInt(computed.getPropertyValue('padding-top'), 10)
-		+ field.scrollHeight
-		+ parseInt(computed.getPropertyValue('padding-bottom'), 10)
-		+ parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+    // Calculate the height
+    var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+        + parseInt(computed.getPropertyValue('padding-top'), 10)
+        + field.scrollHeight
+        + parseInt(computed.getPropertyValue('padding-bottom'), 10)
+        + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
 
-	field.style.height = height + 'px';
-	$("#afterVoorbladNotesEditContent")[0].style.height = "0px";
+    field.style.height = height + 'px';
+
+    if (heightHolder != null)
+        heightHolder.style.height = "0px";
 };
 
