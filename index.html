@@ -297,11 +297,42 @@ function activateTemplateInstance(el) {
     el.classList.remove("template-staging");
 }
 
-function createNote(content, isDark = false) {
-	let el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
-	$("[data-id=\"noteContent\"]", el)[0].innerHTML = content;
+class Note {
+	constructor(content, isDark = false) {
+		this.el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
+		this.content = {};
+		this.content.el = $("[data-id=\"noteContent\"]", this.el)[0];
+		this.content.raw = content;
+		this.content.el.innerHTML = this.content.raw;
 
-	activateTemplateInstance(el);
+		this.card = {};
+		this.card.el = $("[data-id=\"noteCard\"]", this.el)[0];
+		this.card.currentStyle = "light";
+
+		if (isDark)
+			this.setDark();
+		activateTemplateInstance(this.el);
+	}
+
+	setStyle(name) {
+		let newStyle = name;
+		this.card.el.classList.add(`${newStyle}card`);
+		if (this.card.currentStyle != null)
+			this.card.el.classList.remove(`${this.card.currentStyle}card`);
+		this.card.currentStyle = newStyle;
+	}
+
+	setDark() {
+		this.setStyle("dark");
+	}
+
+	setLight() {
+		this.setStyle("light");
+	}
+}
+
+function createNote(content, isDark = false) {
+	new Note(content, isDark);
 }
 
 $(document).ready(function () {
@@ -361,7 +392,7 @@ $(document).ready(function () {
 	});
 
 	createNote("AA");
-	createNote("BB");
+	createNote("BB", true);
 
 	updateClock();
 	startClock();
@@ -433,7 +464,7 @@ var autoExpand = function (field) {
 			<div id="noteComponent" class="template" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
 				margin-top:10px;">
 				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
-					class="card darkcard" id="noteCard">
+					class="card lightcard" id="noteCard">
 					<div class="card-body" id="noteContent">
 						Note text
 					</div>
