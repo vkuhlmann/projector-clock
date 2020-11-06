@@ -60,6 +60,7 @@ function createTemplateInstance(template, container, activeOnAdd = false) {
 
         $(`[marker-end=\"url(#${origID})\"]`).attr("marker-end", `url(#${newID})`);
         $(`[href=\"#${origID}\"]`).attr("href", `#${newID}`);
+        $(`[for=\"${origID}\"]`).attr("for", `${newID}`);
     }
 
     if (!activeOnAdd)

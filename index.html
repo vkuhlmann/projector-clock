@@ -85,8 +85,29 @@
 				margin-top:10px;">
 				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
 					class="card lightcard" id="noteCard">
-					<div class="card-body" id="noteContent">
-						Note text
+					<div class="card-body" id="noteCardBody">
+						<div id="noteEdit" class="hide">
+							<div class="card">
+								<div class="card-header" style="display:flex;flex-flow:row nowrap;"
+									style="font-size:25px;">
+									<div style="flex:1 0 auto;">
+										<label for="noteEditRaw">Edit</label>
+									</div>
+									<div style="flex:0 1 auto;">
+										<button type="button" class="btn btn-dark" id="noteEditClose">Close edit</button>
+									</div>
+								</div>
+								<div class="card-body">
+									<textarea spellcheck="false" style="min-width:30vw;display:block;"
+										class="form-control" id="noteEditRaw"></textarea>
+									<div id="noteEditHeightKeeper" style="height:0px;display:block;"></div>
+								</div>
+							</div>
+							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+						</div>
+						<div id="noteDisplay">
+							Notes couldn't be loaded (have you enabled JavaScript?)
+						</div>
 					</div>
 				</div>
 			</div>
