@@ -242,6 +242,13 @@ function setNotes(value) {
 	$("#notes")[0].innerHTML = value;
 }
 
+function resetNotes() {
+	trySetVoorbladNotesContent(defaultVoorbladNotes, false);
+	let cookieVal = getCookie("notes2");
+	if (cookieVal !== "")
+		setCookie("notes2", "", -1);
+}
+
 $(document).ready(function () {
 	clockUpdateLoop = null;
 	isShowSeconds = false;
@@ -259,7 +266,7 @@ $(document).ready(function () {
 		console.log("Error trying to read notes2");
 	}
 
-	trySetVoorbladNotesContent(voorbladNotesContent);
+	trySetVoorbladNotesContent(voorbladNotesContent, false);
 
 	showVoorbladNotes();
 	showNotes();
@@ -292,7 +299,8 @@ $(document).ready(function () {
 				e.preventDefault();
 				e.stopPropagation();
 			} else if (e.key === "r") {
-				trySetVoorbladNotesContent(defaultVoorbladNotes);
+				//trySetVoorbladNotesContent(defaultVoorbladNotes);
+				resetNotes();
 			}
 		}
 	});
@@ -314,13 +322,15 @@ function stopEditVoorbladNotes() {
 	isEditing = false;
 }
 
-function trySetVoorbladNotesContent(val) {
+function trySetVoorbladNotesContent(val, save) {
 	try {
 		let newDisplay = marked(val);
 		voorbladNotesContent = val;
 		$("#voorbladNotesDisplay")[0].innerHTML = newDisplay;
 
-		setCookie("notes2", voorbladNotesContent, 36500);
+		if (save !== false)
+			setCookie("notes2", voorbladNotesContent, 36500);
+
 		return true;
 	} catch (err) {
 		return false;
