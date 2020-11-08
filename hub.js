@@ -1,6 +1,6 @@
 "use strict";
 
-let isEditing = false;
+let currentEditNote = null;
 
 let defaultVoorbladNotes = `\
 *Click this note to edit its content*
@@ -23,7 +23,7 @@ function onDOMReady() {
     //clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
 
     $("body")[0].addEventListener("keydown", function (e) {
-        if (!isEditing) {
+        if (currentEditNote == null) {
             if (e.key === "f") {
                 $("body")[0].requestFullscreen();
                 e.preventDefault();

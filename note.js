@@ -37,6 +37,8 @@ class Note {
         this.bindListeners();
 
         this.isVisible = true;
+        this.isEditMode = false;
+
         activateTemplateInstance(this.el);
     }
 
@@ -58,7 +60,10 @@ class Note {
     }
 
     startEdit() {
-        isEditing = true;
+        currentEditNote?.stopEdit();
+        currentEditNote = this;
+
+        this.isEditMode = true;
         this.edit.raw.el.value = this.edit.raw.value;
         this.edit.el.classList.remove("hide");
         autoExpand(this.edit.raw.el, this.edit.heightKeeper.el);
@@ -66,7 +71,10 @@ class Note {
 
     stopEdit() {
         this.edit.el.classList.add("hide");
-        isEditing = false;
+
+        this.isEditMode = false;
+        if (currentEditNote === this)
+            currentEditNote = null;
     }
 
     save() {
@@ -129,33 +137,3 @@ function resetNotes() {
     if (cookieVal !== "")
         setCookie("notes2", "", -1);
 }
-
-function startEditVoorbladNotes() {
-    isEditing = true;
-    $("#voorbladNotesEditContent")[0].value = voorbladNotesContent;
-    $("#voorbladNotesEdit")[0].classList.remove("hide");
-    autoExpand($("#voorbladNotesEditContent")[0], $("#afterVoorbladNotesEditContent")[0]);
-}
-
-function stopEditVoorbladNotes() {
-    $("#voorbladNotesEdit")[0].classList.add("hide");
-    //console.log($("#voorbladNotesEdit")[0].classList);
-    isEditing = false;
-}
-
-function trySetVoorbladNotesContent(val, save = true) {
-    try {
-        let newDisplay = marked(val);
-        voorbladNotesContent = val;
-        $("#voorbladNotesDisplay")[0].innerHTML = newDisplay;
-
-        if (save !== false)
-            setCookie("notes2", voorbladNotesContent, 36500);
-
-        return true;
-    } catch (err) {
-        return false;
-    }
-}
-
-
