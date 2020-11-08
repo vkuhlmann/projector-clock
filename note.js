@@ -35,6 +35,8 @@ class Note {
         if (isDark)
             this.setDark();
         this.bindListeners();
+
+        this.isVisible = true;
         activateTemplateInstance(this.el);
     }
 
@@ -98,36 +100,23 @@ class Note {
     setLight() {
         this.setStyle("light");
     }
-}
 
-
-function showNotes(style) {
-    return;
-    switch (style) {
-        case "light": {
-            $("#notesCard")[0].classList.add("lightcard");
-            $("#notesCard")[0].classList.remove("darkcard");
-            break;
-        }
-        case "dark": {
-            $("#notesCard")[0].classList.add("darkcard");
-            $("#notesCard")[0].classList.remove("lightcard");
-            break;
-        }
-
-        default: {
-
-        }
+    show() {
+        this.el.classList.remove("hide");
+        this.isVisible = true;
     }
 
-    $("#notesComponent")[0].classList.remove("hide");
-    notesVisible = true;
-}
+    hide() {
+        this.el.classList.add("hide");
+        this.isVisible = false;
+    }
 
-function hideNotes() {
-    return;
-    $("#notesComponent")[0].classList.add("hide");
-    notesVisible = false;
+    toggleVisible() {
+        if (this.isVisible)
+            this.hide();
+        else
+            this.show();
+    }
 }
 
 function showVoorbladNotes(style) {

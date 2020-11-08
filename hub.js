@@ -15,6 +15,8 @@ let defaultVoorbladNotes = `\
 
 **Good luck!**`;
 
+let notes = [];
+
 function onDOMReady() {
 	clockUpdateLoop = null;
 	isShowSeconds = false;
@@ -23,19 +25,19 @@ function onDOMReady() {
 	//clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
 	//clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
 
-	voorbladNotesContent = defaultVoorbladNotes;
-	try {
-		let notes2Content = getCookie("notes2");
-		if (notes2Content !== "")
-			voorbladNotesContent = notes2Content;
-	} catch (err) {
-		console.log("Error trying to read notes2");
-	}
+	// voorbladNotesContent = defaultVoorbladNotes;
+	// try {
+	// 	let notes2Content = ;
+	// 	if (notes2Content !== "")
+	// 		voorbladNotesContent = notes2Content;
+	// } catch (err) {
+	// 	console.log("Error trying to read notes2");
+	// }
 
-	trySetVoorbladNotesContent(voorbladNotesContent, false);
+	///trySetVoorbladNotesContent(voorbladNotesContent, false);
 
-	showVoorbladNotes();
-	showNotes();
+	//showVoorbladNotes();
+	//showNotes();
 
 	// $("#voorbladNotesDisplay").click(function () {
 	// 	startEditVoorbladNotes();
@@ -57,13 +59,23 @@ function onDOMReady() {
 				e.preventDefault();
 				e.stopPropagation();
 			} else if (e.key === "2") {
-				toggleVoorbladNotes();
-				e.preventDefault();
-				e.stopPropagation();
+				// toggleVoorbladNotes();
+				// e.preventDefault();
+				// e.stopPropagation();
+				if (1 in notes) {
+					notes[1].toggleVisible();
+					//toggleNotes();
+					e.preventDefault();
+					e.stopPropagation();
+				}
+
 			} else if (e.key === "1") {
-				toggleNotes();
-				e.preventDefault();
-				e.stopPropagation();
+				if (0 in notes) {
+					notes[0].toggleVisible();
+					//toggleNotes();
+					e.preventDefault();
+					e.stopPropagation();
+				}
 			} else if (e.key === "r") {
 				//trySetVoorbladNotesContent(defaultVoorbladNotes);
 				resetNotes();
@@ -71,8 +83,12 @@ function onDOMReady() {
 		}
 	});
 
-	new Note("note1", null, true, "Test ends at --:--");
-	new Note("note2", null, false, defaultVoorbladNotes);
+	let note2cont = getCookie("notes2");
+	if (note2cont === "")
+		note2cont = defaultVoorbladNotes;
+
+	notes.push(new Note("note1", null, true, "Test ends at --:--"));
+	notes.push(new Note("note2", null, false, note2cont));
 
 	// new Note("noteAA", null);
 	// new Note("noteBB", null, true, "BB");
