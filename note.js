@@ -131,6 +131,8 @@ function hideNotes() {
 }
 
 function showVoorbladNotes(style) {
+    return;
+
     switch (style) {
         case "light": {
             $("#voorbladNotesCard")[0].classList.add("lightcard");
@@ -153,6 +155,8 @@ function showVoorbladNotes(style) {
 }
 
 function hideVoorbladNotes() {
+    return;
+
     $("#voorbladNotesComponent")[0].classList.add("hide");
     voorbladNotesVisible = false;
 }

@@ -16,7 +16,7 @@ let defaultVoorbladNotes = `\
 **Good luck!**`;
 
 function onDOMReady() {
-    clockUpdateLoop = null;
+	clockUpdateLoop = null;
 	isShowSeconds = false;
 	//clockEvents["13:29:30"] = function () { showSeconds(); };
 	//clockEvents["13:30:00"] = function () { hideSeconds(); };
@@ -37,18 +37,18 @@ function onDOMReady() {
 	showVoorbladNotes();
 	showNotes();
 
-	$("#voorbladNotesDisplay").click(function () {
-		startEditVoorbladNotes();
-	});
+	// $("#voorbladNotesDisplay").click(function () {
+	// 	startEditVoorbladNotes();
+	// });
 
-	$("#voorbladNotesEditContent")[0].addEventListener("input", function () {
-		autoExpand($("#voorbladNotesEditContent")[0], $("#afterVoorbladNotesEditContent")[0]);
-		trySetVoorbladNotesContent($("#voorbladNotesEditContent")[0].value);
-	});
+	// $("#voorbladNotesEditContent")[0].addEventListener("input", function () {
+	// 	autoExpand($("#voorbladNotesEditContent")[0], $("#afterVoorbladNotesEditContent")[0]);
+	// 	trySetVoorbladNotesContent($("#voorbladNotesEditContent")[0].value);
+	// });
 
-	$("#voorbladNotesEditClose")[0].addEventListener("click", function (e) {
-		stopEditVoorbladNotes();
-	});
+	// $("#voorbladNotesEditClose")[0].addEventListener("click", function (e) {
+	// 	stopEditVoorbladNotes();
+	// });
 
 	$("body")[0].addEventListener("keydown", function (e) {
 		if (!isEditing) {
@@ -71,8 +71,11 @@ function onDOMReady() {
 		}
 	});
 
-	new Note("noteAA", null);
-	new Note("noteBB", null, true, "BB");
+	new Note("note1", null, true, "Test ends at --:--");
+	new Note("note2", null, false, defaultVoorbladNotes);
+
+	// new Note("noteAA", null);
+	// new Note("noteBB", null, true, "BB");
 
 	updateClock();
 	startClock();
