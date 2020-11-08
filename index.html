@@ -31,6 +31,10 @@
 		.template-staging {
 			display: none !important;
 		}
+
+		.noteDisplay > :last-child {
+			margin-bottom: 0 !important;
+		}
 	</style>
 
 	<!-- Latest compiled and minified CSS -->
@@ -87,14 +91,14 @@
 					class="card lightcard" id="noteCard">
 					<div class="card-body" id="noteCardBody">
 						<div id="noteEdit" class="hide">
-							<div class="card">
-								<div class="card-header" style="display:flex;flex-flow:row nowrap;"
-									style="font-size:25px;">
+							<div class="card lightcard" style="font-size:1.2rem">
+								<div class="card-header" style="display:flex;flex-flow:row nowrap;">
 									<div style="flex:1 0 auto;">
 										<label for="noteEditRaw">Edit</label>
 									</div>
 									<div style="flex:0 1 auto;">
-										<button type="button" class="btn btn-dark" id="noteEditClose">Close edit</button>
+										<button type="button" class="btn btn-dark" id="noteEditClose">Close
+											edit</button>
 									</div>
 								</div>
 								<div class="card-body">
@@ -105,7 +109,7 @@
 							</div>
 							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
 						</div>
-						<div id="noteDisplay">
+						<div id="noteDisplay" class="noteDisplay">
 							Notes couldn't be loaded (have you enabled JavaScript?)
 						</div>
 					</div>
@@ -146,8 +150,8 @@
 								</div>
 							</div>
 						-->
-							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
-						<!--
+			<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+			<!--
 						</div>
 						<div id="voorbladNotesDisplay">
 							Notes couldn't be loaded (have you enabled JavaScript?)
@@ -155,8 +159,8 @@
 					</div>
 				</div>
 				-->
-			</div>
 		</div>
+	</div>
 </body>
 
 </html>
