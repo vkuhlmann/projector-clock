@@ -3,415 +3,180 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
-	<title>Projector Clock</title>
-	<style>
-		#clockValue {
-			font-size: 140pt;
-		}
+    <meta charset="UTF-8">
+    <title>Projector Clock</title>
+    <style>
+        #clockValue {
+            font-size: 140pt;
+        }
 
-		.hide {
-			display: none !important;
-		}
+        .hide {
+            display: none !important;
+        }
 
-		.lightcard {
-			color: black !important;
-			background-color: #ddd !important;
-		}
+        .lightcard {
+            color: black !important;
+            background-color: #ddd !important;
+        }
 
-		.darkcard {
-			color: #eee !important;
-			background-color: #333 !important;
-		}
-	</style>
+        .darkcard {
+            color: #eee !important;
+            background-color: #333 !important;
+        }
 
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        .template {
+            display: none !important;
+        }
 
-	<!-- jQuery library -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        .template-staging {
+            display: none !important;
+        }
 
-	<!-- Popper JS -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        .noteDisplay> :last-child {
+            margin-bottom: 0 !important;
+        }
+    </style>
 
-	<!-- Latest compiled JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-BQYYBWNWLZ"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
-		gtag('config', 'G-BQYYBWNWLZ');
-	</script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-	<script>
-"use strict";
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-let voorbladNotesContent;
+    <script src="hub.js"></script>
+    <script src="clock.js"></script>
+    <script src="utils.js"></script>
+    <script src="note.js"></script>
 
-let defaultVoorbladNotes = `\
-*Click this note to edit its content*
-# Test on ...
-- Put your phone on silent.
-- Test starts at --:-- and ends at --:--.
-- In the last 30 minutes everyone remains seated.
-- Allowed material: --.
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BQYYBWNWLZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-**Good luck!**`;
+        gtag('config', 'G-BQYYBWNWLZ');
+    </script>
 
-// Source: https://www.w3schools.com/js/js_cookies.asp
-// Modified
-function setCookie(cname, cvalue, exdays) {
-	var d = new Date();
-	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-	var expires = "expires=" + d.toUTCString();
-	let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
-	//console.log("setting cookie: " + cookieString);
-	document.cookie = cookieString;
-	//cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
-}
+    <script>
+        "use strict";
 
-// Source: https://www.w3schools.com/js/js_cookies.asp
-function getCookie(cname) {
-	var name = cname + "=";
-	var ca = document.cookie.split(';');
-	for (var i = 0; i < ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0) == ' ') {
-			c = c.substring(1);
-		}
-		if (c.indexOf(name) == 0) {
-			//console.log("decoding " + c.substring(name.length, c.length));
-			return window.atob(c.substring(name.length, c.length));
-		}
-	}
-	return "";
-}
-
-let clockUpdateLoop;
-let isShowSeconds;
-let clockEvents;
-clockEvents = {};
-
-let isEditing = false;
-let lastEventCheckTime = "";
-let voorbladNotesVisible = false;
-let notesVisible = true;
-
-// Source: https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
-function pad(num, size) {
-	var s = num + "";
-	while (s.length < size) s = "0" + s;
-	return s;
-}
-
-function checkForClockEvents() {
-	let d = new Date();
-	let timeString = pad(d.getHours(), 2) + ":"
-		+ pad(d.getMinutes(), 2) + ":" + pad(d.getSeconds(), 2);
-	let eventEntries = Object.entries(clockEvents).sort((a, b) => (a > b) ? 1 : ((a < b) ? -1 : 0));
-	let i = 0;
-	for (; i < eventEntries.length; i++) {
-		if (eventEntries[i][0] > lastEventCheckTime)
-			break;
-	}
-
-	for (; i < eventEntries.length; i++) {
-		if (eventEntries[i][0] > timeString)
-			break;
-		eventEntries[i][1]();
-	}
-	lastEventCheckTime = timeString;
-}
-
-function updateClock() {
-	let d = new Date();
-	let timeString = pad(d.getHours(), 2) + ":"
-		+ pad(d.getMinutes(), 2);
-	if (isShowSeconds) {
-		timeString += ":" + pad(d.getSeconds(), 2);
-	}
-
-	$("#clockValue")[0].innerText = timeString;
-	checkForClockEvents();
-}
-
-function setClockFontsize(points) {
-	$("#clockValue")[0].style.fontSize = `${points}pt`;
-}
-
-function startClock() {
-	stopClock();
-	clockUpdateLoop = setInterval(updateClock, 200);
-}
-
-function stopClock() {
-	if (clockUpdateLoop != null) {
-		clearInterval(clockUpdateLoop);
-		clockUpdateLoop = null;
-	}
-}
-
-function showSeconds() {
-	isShowSeconds = true;
-}
-
-function hideSeconds() {
-	isShowSeconds = false;
-}
-
-function showNotes(style) {
-	switch (style) {
-		case "light": {
-			$("#notesCard")[0].classList.add("lightcard");
-			$("#notesCard")[0].classList.remove("darkcard");
-			break;
-		}
-		case "dark": {
-			$("#notesCard")[0].classList.add("darkcard");
-			$("#notesCard")[0].classList.remove("lightcard");
-			break;
-		}
-
-		default: {
-
-		}
-	}
-
-	$("#notesComponent")[0].classList.remove("hide");
-	notesVisible = true;
-}
-
-function hideNotes() {
-	$("#notesComponent")[0].classList.add("hide");
-	notesVisible = false;
-}
-
-function showVoorbladNotes(style) {
-	switch (style) {
-		case "light": {
-			$("#voorbladNotesCard")[0].classList.add("lightcard");
-			$("#voorbladNotesCard")[0].classList.remove("darkcard");
-			break;
-		}
-		case "dark": {
-			$("#voorbladNotesCard")[0].classList.add("darkcard");
-			$("#voorbladNotesCard")[0].classList.remove("lightcard");
-			break;
-		}
-
-		default: {
-
-		}
-	}
-
-	$("#voorbladNotesComponent")[0].classList.remove("hide");
-	voorbladNotesVisible = true;
-}
-
-function hideVoorbladNotes() {
-	$("#voorbladNotesComponent")[0].classList.add("hide");
-	voorbladNotesVisible = false;
-}
-
-function toggleVoorbladNotes() {
-	if (voorbladNotesVisible)
-		hideVoorbladNotes();
-	else
-		showVoorbladNotes();
-}
-
-
-function toggleNotes() {
-	if (notesVisible)
-		hideNotes();
-	else
-		showNotes();
-}
-
-function getNotes() {
-	return $("#notes")[0].innerHTML;
-}
-
-function setNotes(value) {
-	$("#notes")[0].innerHTML = value;
-}
-
-function resetNotes() {
-	trySetVoorbladNotesContent(defaultVoorbladNotes, false);
-	let cookieVal = getCookie("notes2");
-	if (cookieVal !== "")
-		setCookie("notes2", "", -1);
-}
-
-$(document).ready(function () {
-	clockUpdateLoop = null;
-	isShowSeconds = false;
-	//clockEvents["13:29:30"] = function () { showSeconds(); };
-	//clockEvents["13:30:00"] = function () { hideSeconds(); };
-	//clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
-	//clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
-
-	voorbladNotesContent = defaultVoorbladNotes;
-	try {
-		let notes2Content = getCookie("notes2");
-		if (notes2Content !== "")
-			voorbladNotesContent = notes2Content;
-	} catch (err) {
-		console.log("Error trying to read notes2");
-	}
-
-	trySetVoorbladNotesContent(voorbladNotesContent, false);
-
-	showVoorbladNotes();
-	showNotes();
-
-	$("#voorbladNotesDisplay").click(function () {
-		startEditVoorbladNotes();
-	});
-
-	$("#voorbladNotesEditContent")[0].addEventListener("input", function () {
-		autoExpand($("#voorbladNotesEditContent")[0]);
-		trySetVoorbladNotesContent($("#voorbladNotesEditContent")[0].value);
-	});
-
-	$("#voorbladNotesEditClose")[0].addEventListener("click", function (e) {
-		stopEditVoorbladNotes();
-	});
-
-	$("body")[0].addEventListener("keydown", function (e) {
-		if (!isEditing) {
-			if (e.key === "f") {
-				$("body")[0].requestFullscreen();
-				e.preventDefault();
-				e.stopPropagation();
-			} else if (e.key === "2") {
-				toggleVoorbladNotes();
-				e.preventDefault();
-				e.stopPropagation();
-			} else if (e.key === "1") {
-				toggleNotes();
-				e.preventDefault();
-				e.stopPropagation();
-			} else if (e.key === "r") {
-				//trySetVoorbladNotesContent(defaultVoorbladNotes);
-				resetNotes();
-			}
-		}
-	});
-
-	updateClock();
-	startClock();
-});
-
-function startEditVoorbladNotes() {
-	isEditing = true;
-	$("#voorbladNotesEditContent")[0].value = voorbladNotesContent;
-	$("#voorbladNotesEdit")[0].classList.remove("hide");
-	autoExpand($("#voorbladNotesEditContent")[0]);
-}
-
-function stopEditVoorbladNotes() {
-	$("#voorbladNotesEdit")[0].classList.add("hide");
-	//console.log($("#voorbladNotesEdit")[0].classList);
-	isEditing = false;
-}
-
-function trySetVoorbladNotesContent(val, save) {
-	try {
-		let newDisplay = marked(val);
-		voorbladNotesContent = val;
-		$("#voorbladNotesDisplay")[0].innerHTML = newDisplay;
-
-		if (save !== false)
-			setCookie("notes2", voorbladNotesContent, 36500);
-
-		return true;
-	} catch (err) {
-		return false;
-	}
-}
-
-// Source: https://gomakethings.com/automatically-expand-a-textarea-as-the-user-types-using-vanilla-javascript/
-// Modified
-var autoExpand = function (field) {
-	$("#afterVoorbladNotesEditContent")[0].style.height = field.style.height;
-
-	// Reset field height
-	field.style.height = 'inherit';
-
-	// Get the computed styles for the element
-	var computed = window.getComputedStyle(field);
-
-	// Calculate the height
-	var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
-		+ parseInt(computed.getPropertyValue('padding-top'), 10)
-		+ field.scrollHeight
-		+ parseInt(computed.getPropertyValue('padding-bottom'), 10)
-		+ parseInt(computed.getPropertyValue('border-bottom-width'), 10);
-
-	field.style.height = height + 'px';
-	$("#afterVoorbladNotesEditContent")[0].style.height = "0px";
-};
-	</script>
+        $(document).ready(function () {
+            onDOMReady();
+        });
+    </script>
 </head>
 
 <body style="background-color:black;color:#eee;font-size:30px;">
-	<div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
-		display:flex;flex-flow:row nowrap;justify-content:center;">
-		<div style="display:flex;flex-flow:column nowrap; justify-content:center;">
-			<div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
-			margin-bottom:10px;">
-				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue">--:--</div>
-			</div>
+    <div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
+        display:flex;flex-flow:row nowrap;justify-content:center;">
+        <div style="display:flex;flex-flow:column nowrap; justify-content:center;" id="componentContainer">
 
-			<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
-				margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
-					class="card darkcard" id="notesCard">
-					<div class="card-body" id="notes">
-						Test ends at --:--
-					</div>
-				</div>
-			</div>
+            <div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+            margin-bottom:10px;">
+                <div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue">--:--</div>
+            </div>
 
-			<div id="voorbladNotesComponent"
-				style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
-					class="card lightcard" id="voorbladNotesCard">
-					<div class="card-body" id="voorbladNotes" style="font-size:30px;">
-						<div id="voorbladNotesEdit" class="hide">
-							<div class="card">
-								<div class="card-header" style="display:flex;flex-flow:row nowrap;"
-									style="font-size:25px;">
-									<div style="flex:1 0 auto;">
-										<label for="voorbladNotesEditContent">Bewerken</label>
-									</div>
-									<div style="flex:0 1 auto;">
-										<button type="button" class="btn btn-dark" id="voorbladNotesEditClose">Bewerken
-											sluiten</button>
-									</div>
-								</div>
-								<div class="card-body">
-									<textarea spellcheck="false" style="min-width:30vw;display:block;"
-										class="form-control" id="voorbladNotesEditContent"></textarea>
-									<div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
-								</div>
-							</div>
-							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
-						</div>
-						<div id="voorbladNotesDisplay">
-							Notes couldn't be loaded (have you enabled JavaScript?)
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+            <div id="noteComponent" class="template" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+                margin-top:10px;">
+                <div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+                    class="card lightcard" id="noteCard">
+                    <div class="card-body" id="noteCardBody">
+                        <div id="noteEdit" class="hide">
+                            <div class="card lightcard" style="font-size:1.2rem">
+                                <div class="card-header" style="display:flex;flex-flow:row nowrap;">
+                                    <div style="flex:1 0 auto;">
+                                        <label for="noteEditRaw">Edit</label>
+                                    </div>
+                                    <div style="flex:0 1 auto;margin-left:10px;">
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"
+                                                id="noteThemeSelected">
+                                                Light
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <button class="dropdown-item" id="selectNoteThemeLight">
+                                                    Light
+                                                </button>
+                                                <button class="dropdown-item" id="selectNoteThemeDark">
+                                                    Dark
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="flex:0 1 auto;margin-left:10px;">
+                                        <button type="button" class="btn btn-dark" id="noteEditClose">Close
+                                            edit</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <textarea spellcheck="false" style="min-width:30vw;display:block;"
+                                        class="form-control" id="noteEditRaw"></textarea>
+                                    <div id="noteEditHeightKeeper" style="height:0px;display:block;"></div>
+                                </div>
+                            </div>
+                            <!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+                        </div>
+                        <div id="noteDisplay" class="noteDisplay">
+                            Notes couldn't be loaded (have you enabled JavaScript?)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+                margin-top:10px;">
+                <div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+                    class="card darkcard" id="notesCard">
+                    <div class="card-body" id="notes">
+                        Test ends at --:--
+                    </div>
+                </div>
+            </div>-->
+
+            <!--<div id="voorbladNotesComponent"
+                style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
+                <div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+                    class="card lightcard" id="voorbladNotesCard">
+                    <div class="card-body" id="voorbladNotes" style="font-size:30px;">
+                        <div id="voorbladNotesEdit" class="hide">
+                            <div class="card">
+                                <div class="card-header" style="display:flex;flex-flow:row nowrap;"
+                                    style="font-size:25px;">
+                                    <div style="flex:1 0 auto;">
+                                        <label for="voorbladNotesEditContent">Bewerken</label>
+                                    </div>
+                                    <div style="flex:0 1 auto;">
+                                        <button type="button" class="btn btn-dark" id="voorbladNotesEditClose">Bewerken
+                                            sluiten</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <textarea spellcheck="false" style="min-width:30vw;display:block;"
+                                        class="form-control" id="voorbladNotesEditContent"></textarea>
+                                    <div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
+                                </div>
+                            </div>
+                        -->
+            <!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+            <!--
+                        </div>
+                        <div id="voorbladNotesDisplay">
+                            Notes couldn't be loaded (have you enabled JavaScript?)
+                        </div>
+                    </div>
+                </div>
+                -->
+        </div>
+    </div>
 </body>
 
 </html>
