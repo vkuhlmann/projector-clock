@@ -100,4 +100,3 @@ var autoExpand = function (field, heightHolder) {
     if (heightHolder != null)
         heightHolder.style.height = "0px";
 };
-
