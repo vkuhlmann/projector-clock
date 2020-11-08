@@ -3,164 +3,164 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
-	<title>Projector Clock</title>
-	<style>
-		#clockValue {
-			font-size: 140pt;
-		}
+    <meta charset="UTF-8">
+    <title>Projector Clock</title>
+    <style>
+        #clockValue {
+            font-size: 140pt;
+        }
 
-		.hide {
-			display: none !important;
-		}
+        .hide {
+            display: none !important;
+        }
 
-		.lightcard {
-			color: black !important;
-			background-color: #ddd !important;
-		}
+        .lightcard {
+            color: black !important;
+            background-color: #ddd !important;
+        }
 
-		.darkcard {
-			color: #eee !important;
-			background-color: #333 !important;
-		}
+        .darkcard {
+            color: #eee !important;
+            background-color: #333 !important;
+        }
 
-		.template {
-			display: none !important;
-		}
+        .template {
+            display: none !important;
+        }
 
-		.template-staging {
-			display: none !important;
-		}
+        .template-staging {
+            display: none !important;
+        }
 
-		.noteDisplay > :last-child {
-			margin-bottom: 0 !important;
-		}
-	</style>
+        .noteDisplay > :last-child {
+            margin-bottom: 0 !important;
+        }
+    </style>
 
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-	<!-- jQuery library -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-	<!-- Popper JS -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
-	<!-- Latest compiled JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-	<script src="clock.js"></script>
-	<script src="hub.js"></script>
-	<script src="utils.js"></script>
-	<script src="note.js"></script>
+    <script src="clock.js"></script>
+    <script src="hub.js"></script>
+    <script src="utils.js"></script>
+    <script src="note.js"></script>
 
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-BQYYBWNWLZ"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag() { dataLayer.push(arguments); }
-		gtag('js', new Date());
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BQYYBWNWLZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-		gtag('config', 'G-BQYYBWNWLZ');
-	</script>
+        gtag('config', 'G-BQYYBWNWLZ');
+    </script>
 
-	<script>
-		"use strict";
+    <script>
+        "use strict";
 
-		$(document).ready(function () {
-			onDOMReady();
-		});
-	</script>
+        $(document).ready(function () {
+            onDOMReady();
+        });
+    </script>
 </head>
 
 <body style="background-color:black;color:#eee;font-size:30px;">
-	<div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
-		display:flex;flex-flow:row nowrap;justify-content:center;">
-		<div style="display:flex;flex-flow:column nowrap; justify-content:center;" id="componentContainer">
+    <div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
+        display:flex;flex-flow:row nowrap;justify-content:center;">
+        <div style="display:flex;flex-flow:column nowrap; justify-content:center;" id="componentContainer">
 
-			<div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
-			margin-bottom:10px;">
-				<div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue">--:--</div>
-			</div>
+            <div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+            margin-bottom:10px;">
+                <div style="display:block;flex:0 1 auto;cursor:none;" id="clockValue">--:--</div>
+            </div>
 
-			<div id="noteComponent" class="template" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
-				margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
-					class="card lightcard" id="noteCard">
-					<div class="card-body" id="noteCardBody">
-						<div id="noteEdit" class="hide">
-							<div class="card lightcard" style="font-size:1.2rem">
-								<div class="card-header" style="display:flex;flex-flow:row nowrap;">
-									<div style="flex:1 0 auto;">
-										<label for="noteEditRaw">Edit</label>
-									</div>
-									<div style="flex:0 1 auto;">
-										<button type="button" class="btn btn-dark" id="noteEditClose">Close
-											edit</button>
-									</div>
-								</div>
-								<div class="card-body">
-									<textarea spellcheck="false" style="min-width:30vw;display:block;"
-										class="form-control" id="noteEditRaw"></textarea>
-									<div id="noteEditHeightKeeper" style="height:0px;display:block;"></div>
-								</div>
-							</div>
-							<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
-						</div>
-						<div id="noteDisplay" class="noteDisplay">
-							Notes couldn't be loaded (have you enabled JavaScript?)
-						</div>
-					</div>
-				</div>
-			</div>
+            <div id="noteComponent" class="template" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+                margin-top:10px;">
+                <div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+                    class="card lightcard" id="noteCard">
+                    <div class="card-body" id="noteCardBody">
+                        <div id="noteEdit" class="hide">
+                            <div class="card lightcard" style="font-size:1.2rem">
+                                <div class="card-header" style="display:flex;flex-flow:row nowrap;">
+                                    <div style="flex:1 0 auto;">
+                                        <label for="noteEditRaw">Edit</label>
+                                    </div>
+                                    <div style="flex:0 1 auto;">
+                                        <button type="button" class="btn btn-dark" id="noteEditClose">Close
+                                            edit</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <textarea spellcheck="false" style="min-width:30vw;display:block;"
+                                        class="form-control" id="noteEditRaw"></textarea>
+                                    <div id="noteEditHeightKeeper" style="height:0px;display:block;"></div>
+                                </div>
+                            </div>
+                            <!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+                        </div>
+                        <div id="noteDisplay" class="noteDisplay">
+                            Notes couldn't be loaded (have you enabled JavaScript?)
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-			<!--<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
-				margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
-					class="card darkcard" id="notesCard">
-					<div class="card-body" id="notes">
-						Test ends at --:--
-					</div>
-				</div>
-			</div>-->
+            <!--<div id="notesComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
+                margin-top:10px;">
+                <div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+                    class="card darkcard" id="notesCard">
+                    <div class="card-body" id="notes">
+                        Test ends at --:--
+                    </div>
+                </div>
+            </div>-->
 
-			<!--<div id="voorbladNotesComponent"
-				style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
-				<div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
-					class="card lightcard" id="voorbladNotesCard">
-					<div class="card-body" id="voorbladNotes" style="font-size:30px;">
-						<div id="voorbladNotesEdit" class="hide">
-							<div class="card">
-								<div class="card-header" style="display:flex;flex-flow:row nowrap;"
-									style="font-size:25px;">
-									<div style="flex:1 0 auto;">
-										<label for="voorbladNotesEditContent">Bewerken</label>
-									</div>
-									<div style="flex:0 1 auto;">
-										<button type="button" class="btn btn-dark" id="voorbladNotesEditClose">Bewerken
-											sluiten</button>
-									</div>
-								</div>
-								<div class="card-body">
-									<textarea spellcheck="false" style="min-width:30vw;display:block;"
-										class="form-control" id="voorbladNotesEditContent"></textarea>
-									<div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
-								</div>
-							</div>
-						-->
-			<!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
-			<!--
-						</div>
-						<div id="voorbladNotesDisplay">
-							Notes couldn't be loaded (have you enabled JavaScript?)
-						</div>
-					</div>
-				</div>
-				-->
-		</div>
-	</div>
+            <!--<div id="voorbladNotesComponent"
+                style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;margin-top:10px;">
+                <div style="display:block;flex:0 1 auto;max-width:95vw;max-width:min(95vw, max(30ch, 60vw));"
+                    class="card lightcard" id="voorbladNotesCard">
+                    <div class="card-body" id="voorbladNotes" style="font-size:30px;">
+                        <div id="voorbladNotesEdit" class="hide">
+                            <div class="card">
+                                <div class="card-header" style="display:flex;flex-flow:row nowrap;"
+                                    style="font-size:25px;">
+                                    <div style="flex:1 0 auto;">
+                                        <label for="voorbladNotesEditContent">Bewerken</label>
+                                    </div>
+                                    <div style="flex:0 1 auto;">
+                                        <button type="button" class="btn btn-dark" id="voorbladNotesEditClose">Bewerken
+                                            sluiten</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <textarea spellcheck="false" style="min-width:30vw;display:block;"
+                                        class="form-control" id="voorbladNotesEditContent"></textarea>
+                                    <div id="afterVoorbladNotesEditContent" style="height:0px;display:block;"></div>
+                                </div>
+                            </div>
+                        -->
+            <!--<span class="textarea form-control" role="textbox" id="voorbladNotesEditContent" contenteditable></span>-->
+            <!--
+                        </div>
+                        <div id="voorbladNotesDisplay">
+                            Notes couldn't be loaded (have you enabled JavaScript?)
+                        </div>
+                    </div>
+                </div>
+                -->
+        </div>
+    </div>
 </body>
 
 </html>
