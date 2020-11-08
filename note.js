@@ -57,6 +57,14 @@ class Note {
         $("[data-id=\"noteEditClose\"]", this.edit.el)[0].addEventListener("click", function (e) {
             that.stopEdit();
         });
+
+        $("[data-id=\"selectNoteThemeLight\"]", this.edit.el)[0].addEventListener("click", function (e) {
+            that.setLight();
+        });
+
+        $("[data-id=\"selectNoteThemeDark\"]", this.edit.el)[0].addEventListener("click", function (e) {
+            that.setDark();
+        });
     }
 
     startEdit() {
@@ -99,10 +107,18 @@ class Note {
 
     setStyle(name) {
         let newStyle = name;
-        this.card.el.classList.add(`${newStyle}card`);
-        if (this.card.currentStyle != null)
-            this.card.el.classList.remove(`${this.card.currentStyle}card`);
+        if (this.card.currentStyle !== newStyle) {
+            this.card.el.classList.add(`${newStyle}card`);
+            if (this.card.currentStyle != null)
+                this.card.el.classList.remove(`${this.card.currentStyle}card`);
+        }
         this.card.currentStyle = newStyle;
+        let friendlyName = this.card.currentStyle;
+        if (friendlyName === "light")
+            friendlyName = "Light";
+        if (friendlyName === "dark")
+            friendlyName = "Dark";
+        $("[data-id=\"noteThemeSelected\"]", this.edit.el)[0].innerHTML = friendlyName;
     }
 
     setDark() {
