@@ -12,7 +12,9 @@ let defaultVoorbladNotes = `\
 
 **Good luck!**`;
 
-let notes = [];
+let note2cont;
+
+let sess;
 
 function onDOMReady() {
     clockUpdateLoop = null;
@@ -29,37 +31,50 @@ function onDOMReady() {
                 e.preventDefault();
                 e.stopPropagation();
             } else if (e.key === "2") {
-                if (1 in notes) {
-                    notes[1].toggleVisible();
+                if (1 in sess.notes) {
+                    sess.notes[1].toggleVisible();
                     e.preventDefault();
                     e.stopPropagation();
                 }
 
             } else if (e.key === "1") {
-                if (0 in notes) {
-                    notes[0].toggleVisible();
+                if (0 in sess.notes) {
+                    sess.notes[0].toggleVisible();
                     e.preventDefault();
                     e.stopPropagation();
                 }
             } else if (e.key === "r") {
-                resetNotes();
+                //resetNotes();
             }
         }
     });
 
-    let note2cont = getCookie("notes2");
+    note2cont = getCookie("notes2");
     let isOldCookieExists = note2cont !== "";
 
     if (!isOldCookieExists)
         note2cont = defaultVoorbladNotes;
 
-    notes.push(new Note("note1", null, true, "Test ends at --:--"));
-    notes.push(new Note("note2", null, false, note2cont));
+    //notes.push(new Note("note1", null, true, "Test ends at --:--"));
+    //notes.push(new Note("note2", null, false, note2cont));
 
-    if (isOldCookieExists) {
-        notes[1].save();
-        setCookie("notes2", "", -1);
-    }
+    // let firstNoteValue = getCookie("markdown-note1");
+    // if (firstNoteValue === "")
+    //     firstNoteValue = "Test ends at --:--";
+    // let secondNoteValue = getCookie("markdown-note2");
+    // if (secondNoteValue === "")
+    //     secondNoteValue = note2cont;
+
+    // notes.push(Note.Create(firstNoteValue, "dark"));
+    // notes.push(Note.Create(secondNoteValue, "light"));
+
+    // if (isOldCookieExists) {
+    //     notes[1].save();
+    //     setCookie("notes2", "", -1);
+    // }
+
+    debugger;
+    sess = new Session({});
 
     updateClock();
     startClock();

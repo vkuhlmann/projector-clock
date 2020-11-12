@@ -1,16 +1,28 @@
 "use strict";
 
 class Note {
-    constructor(name, content, isDark = false, defaultContent = null) {
-        this.name = name;
+    static Create(content, theme = "light") {
+        return new Note({
+            markdown: content,
+            theme: theme,
+            display: true
+        });
+        //return null;
+
+        // this.defaultContent = defaultContent ?? content ?? "Empty";
+        // if ((content == null || content === "") && this.name != null)
+        //     content = getCookie(`markdown-${this.name}`);
+
+        // if (content == null || content === "")
+        //     content = this.defaultContent;
+    }
+
+    constructor(descriptor) {
+        this.onMinorEditListeners = [];
+        this.onMajorEditListeners = [];
+
         this.el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
-
-        this.defaultContent = defaultContent ?? content ?? "Empty";
-        if ((content == null || content === "") && this.name != null)
-            content = getCookie(`markdown-${this.name}`);
-
-        if (content == null || content === "")
-            content = this.defaultContent;
+        this.descriptor = descriptor;
 
         this.display = {};
         this.display.el = $("[data-id=\"noteDisplay\"]", this.el)[0];
@@ -30,16 +42,28 @@ class Note {
         this.card.el = $("[data-id=\"noteCard\"]", this.el)[0];
         this.card.currentStyle = "light";
 
-        this.setRaw(content, false);
+        this.setRaw(this.descriptor?.markdown ?? "", false);
+        this.setStyle(this.descriptor?.theme ?? "light");
 
-        if (isDark)
-            this.setDark();
+        // if (isDark)
+        //     this.setDark();
         this.bindListeners();
 
         this.isVisible = true;
+        if (this.descriptor?.display === false)
+            this.hide();
         this.isEditMode = false;
 
         activateTemplateInstance(this.el);
+    }
+
+    getDescriptor() {
+        const that = this;
+        return new {
+            markdown: that.edit.raw,
+            theme: that.card.currentStyle,
+            display: that.isVisible
+        };
     }
 
     bindListeners() {
@@ -85,9 +109,9 @@ class Note {
             currentEditNote = null;
     }
 
-    save() {
-        this.setRaw(this.edit.raw.value, true);
-    }
+    // save() {
+    //     this.setRaw(this.edit.raw.value, true);
+    // }
 
     setRaw(val, save = true) {
         try {
@@ -96,8 +120,12 @@ class Note {
             this.display.raw = this.edit.raw.value;
             this.display.el.innerHTML = newDisplay;
 
-            if (save !== false && this.name != null)
-                setCookie(`markdown-${this.name}`, this.edit.raw.value, 36500);
+            if (save) {
+                for (let list of this.onMajorEditListeners)
+                    list("note-content");
+            }
+            // if (save !== false && this.name != null)
+            //     setCookie(`markdown-${this.name}`, this.edit.raw.value, 36500);
 
             return true;
         } catch (err) {
@@ -119,6 +147,9 @@ class Note {
         if (friendlyName === "dark")
             friendlyName = "Dark";
         $("[data-id=\"noteThemeSelected\"]", this.edit.el)[0].innerHTML = friendlyName;
+
+        for (let list of this.onMajorEditListeners)
+            list("note-theme");
     }
 
     setDark() {
@@ -147,9 +178,9 @@ class Note {
     }
 }
 
-function resetNotes() {
-    trySetVoorbladNotesContent(defaultVoorbladNotes, false);
-    let cookieVal = getCookie("notes2");
-    if (cookieVal !== "")
-        setCookie("notes2", "", -1);
-}
+// function resetNotes() {
+//     trySetVoorbladNotesContent(defaultVoorbladNotes, false);
+//     let cookieVal = getCookie("notes2");
+//     if (cookieVal !== "")
+//         setCookie("notes2", "", -1);
+// }
