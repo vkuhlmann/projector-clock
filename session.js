@@ -47,7 +47,7 @@ class Session {
         const session = this;
 
         for (let noteDesc of this.description.notes) {
-            let a = new Note(noteDesc);
+            let a = new Note(noteDesc, false);
             this.notes.push(a);
             a.onMajorEditListeners.push(function(name){session.handleMajorEdit(name)});
             a.onMinorEditListeners.push(function(name){session.handleMinorEdit(name)});
@@ -55,6 +55,23 @@ class Session {
 
         // this.notes.push(Note.Create(firstNoteValue, "dark"));
         // notes.push(Note.Create(secondNoteValue, "light"));
+    }
+
+    startPresent() {
+        currPresent?.stopPresent();
+        for (let l of this.notes) {
+            l.addSelf();
+        }
+        currPresent = this;
+    }
+
+    stopPresent() {
+        if (currPresent === this) {
+            for (let l of this.notes) {
+                l.removeSelf();
+            }
+            currPresent = null;
+        }
     }
 
     getDescription() {

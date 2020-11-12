@@ -17,37 +17,37 @@ class Note {
         //     content = this.defaultContent;
     }
 
-    constructor(description) {
+    constructor(description, addSelf = true) {
         this.onMinorEditListeners = [];
         this.onMajorEditListeners = [];
+        this.container = null;
 
-        this.el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
         this.description = description;
 
         this.display = {};
-        this.display.el = $("[data-id=\"noteDisplay\"]", this.el)[0];
+
         //this.display.raw = content;
         //this.display.el.innerHTML = this.display.raw;
 
         this.edit = {};
-        this.edit.el = $("[data-id=\"noteEdit\"]", this.el)[0];
         this.edit.raw = {}
         //this.edit.raw.value = this.display.raw;
-        this.edit.raw.el = $("[data-id=\"noteEditRaw\"]", this.edit.el)[0];
 
         this.edit.heightKeeper = {};
-        this.edit.heightKeeper.el = $("[data-id=\"noteEditHeightKeeper\"]", this.edit.el)[0];
 
         this.card = {};
-        this.card.el = $("[data-id=\"noteCard\"]", this.el)[0];
         this.card.currentStyle = "light";
+
+        this.createElement();
+        if (addSelf)
+            this.addSelf();
 
         this.setRaw(this.description?.markdown ?? "", false);
         this.setStyle(this.description?.theme ?? "light");
 
         // if (isDark)
         //     this.setDark();
-        this.bindListeners();
+        //this.bindListeners();
 
         this.isVisible = true;
         if (this.description?.display === false)
@@ -55,6 +55,42 @@ class Note {
         this.isEditMode = false;
 
         activateTemplateInstance(this.el);
+    }
+
+    createElement() {
+        //this.el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
+        this.el = createTemplateInstance("noteComponent", null, false);
+
+        this.display.el = $("[data-id=\"noteDisplay\"]", this.el)[0];
+        this.edit.el = $("[data-id=\"noteEdit\"]", this.el)[0];
+        this.edit.raw.el = $("[data-id=\"noteEditRaw\"]", this.edit.el)[0];
+        this.edit.heightKeeper.el = $("[data-id=\"noteEditHeightKeeper\"]", this.edit.el)[0];
+        this.card.el = $("[data-id=\"noteCard\"]", this.el)[0];
+
+        this.bindListeners();
+    }
+
+    addSelf() {
+        this.removeSelf();
+        this.container = $("#componentContainer")[0];
+
+        this.el.remove();
+        this.container.appendChild(this.el);
+    }
+
+    removeSelf() {
+        if (this.container == null)
+            return;
+        this.el.remove();
+        this.container = null;
+        //this.container.removeChild(this.el);
+
+        // this.el = null;
+        // this.display.el = null;
+        // this.edit.el = null;
+        // this.edit.raw.el = null;
+        // this.edit.heightKeeper = null;
+        // this.card = null;
     }
 
     getDescription() {

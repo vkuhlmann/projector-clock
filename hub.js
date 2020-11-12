@@ -15,6 +15,7 @@ let defaultVoorbladNotes = `\
 let note2cont;
 
 let sess;
+let currPresent;
 
 function onDOMReady() {
     clockUpdateLoop = null;
@@ -44,7 +45,10 @@ function onDOMReady() {
                     e.stopPropagation();
                 }
             } else if (e.key === "r") {
+                sess.stopPresent();
                 //resetNotes();
+            } else if (e.key === "t") {
+                sess.startPresent();
             }
         }
     });
@@ -75,6 +79,8 @@ function onDOMReady() {
 
     //debugger;
     sess = new Session("demo");
+
+    sess.startPresent();
 
     updateClock();
     startClock();
