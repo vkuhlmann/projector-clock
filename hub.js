@@ -73,8 +73,8 @@ function onDOMReady() {
     //     setCookie("notes2", "", -1);
     // }
 
-    debugger;
-    sess = new Session({});
+    //debugger;
+    sess = new Session("demo");
 
     updateClock();
     startClock();

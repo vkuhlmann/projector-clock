@@ -17,12 +17,12 @@ class Note {
         //     content = this.defaultContent;
     }
 
-    constructor(descriptor) {
+    constructor(description) {
         this.onMinorEditListeners = [];
         this.onMajorEditListeners = [];
 
         this.el = createTemplateInstance("noteComponent", $("#componentContainer")[0], false);
-        this.descriptor = descriptor;
+        this.description = description;
 
         this.display = {};
         this.display.el = $("[data-id=\"noteDisplay\"]", this.el)[0];
@@ -42,25 +42,25 @@ class Note {
         this.card.el = $("[data-id=\"noteCard\"]", this.el)[0];
         this.card.currentStyle = "light";
 
-        this.setRaw(this.descriptor?.markdown ?? "", false);
-        this.setStyle(this.descriptor?.theme ?? "light");
+        this.setRaw(this.description?.markdown ?? "", false);
+        this.setStyle(this.description?.theme ?? "light");
 
         // if (isDark)
         //     this.setDark();
         this.bindListeners();
 
         this.isVisible = true;
-        if (this.descriptor?.display === false)
+        if (this.description?.display === false)
             this.hide();
         this.isEditMode = false;
 
         activateTemplateInstance(this.el);
     }
 
-    getDescriptor() {
+    getDescription() {
         const that = this;
-        return new {
-            markdown: that.edit.raw,
+        return {
+            markdown: that.edit.raw.value,
             theme: that.card.currentStyle,
             display: that.isVisible
         };
