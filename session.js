@@ -1,6 +1,20 @@
 "use strict";
 
 class Session {
+    static GetAllCookieNames() {
+        let pairs = document.cookie.split(';');
+        let dict = {};
+
+        let reg = /^\s*(session-([^\s=]*))\s*=\s*([^\s]*)\s*$/;
+        for (let p of pairs) {
+            let m = p.match(reg);
+            if (m == null)
+                continue;
+            dict[m[1]] = m[3];
+        }
+        return Object.keys(dict);
+    }
+
     constructor(src, saveHandler = null) {
         this.saveHandler = saveHandler;
         this.saveName = `session-${pad(Math.floor(Math.random() * 1000), 4)}`;

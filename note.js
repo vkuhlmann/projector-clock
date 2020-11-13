@@ -17,7 +17,7 @@ class Note {
         //     content = this.defaultContent;
     }
 
-    constructor(description, addSelf = true) {
+    constructor(description, addSelf = false) {
         this.onMinorEditListeners = [];
         this.onMajorEditListeners = [];
         this.container = null;

@@ -17,6 +17,35 @@ let note2cont;
 let sess;
 let currPresent;
 
+function addSessionChoice(src, friendlyName) {
+    let el = htmlToElement(`\
+    <button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? "" : src}">
+        ${friendlyName}
+    </button>\
+    `);
+
+    $("#sessionSelections")[0].insertAdjacentElement("beforeend", el);
+    el.addEventListener("click", function () {
+        setSession(src);
+    });
+
+    //     $("#sessionSelections")[0].insertAdjacentHTML("beforeend",
+    //         `\
+    // <button class="dropdown-item" data-id="selectSession" data-value="${name}">
+    //     ${friendlyName}
+    // </button>`
+    //     );
+}
+
+function setSession(src) {
+    if (!(src instanceof Session))
+        src = new Session(src);
+
+    sess = src;
+    if (sess != null)
+        sess.startPresent();
+}
+
 function onDOMReady() {
     clockUpdateLoop = null;
     isShowSeconds = false;
@@ -78,6 +107,16 @@ function onDOMReady() {
     // }
 
     //debugger;
+    let sess1 = new Session("1");
+    let sess2 = new Session("2");
+    let sess3 = new Session("3");
+    sess1.notes = [Note.Create("Hey!"), Note.Create("Daar!")];
+    sess2.notes = [Note.Create("Hier maar een enkel kader.")];
+
+    addSessionChoice(sess1, "Session 1");
+    addSessionChoice(sess2, "Session 2");
+    addSessionChoice(sess3, "Session 3");
+
     sess = new Session("demo");
 
     sess.startPresent();

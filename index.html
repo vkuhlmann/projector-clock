@@ -78,8 +78,24 @@
 
 <body style="background-color:black;color:#eee;font-size:30px;">
     <div style="position:absolute;left:0px;right:0px;top:0px;min-height:100vh;
-        display:flex;flex-flow:row nowrap;justify-content:center;">
-        <div style="display:flex;flex-flow:column nowrap; justify-content:center;" id="componentContainer">
+        display:flex;flex-flow:column nowrap;">
+        <div style="flex:0 0 auto">
+            <div class="dropdown" style="margin-left:10px;">
+                <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown"
+                    id="selectedSession">
+                    [Session]
+                </button>
+                <div class="dropdown-menu" id="sessionSelections">
+                    <button class="dropdown-item" id="selectSessionNew">
+                        New
+                    </button>
+                    <button class="dropdown-item" data-id="selectSession" data-value="session-demo">
+                        Demo session
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div style="flex:1 0 auto;display:flex;flex-flow:column nowrap; justify-content:center;" id="componentContainer">
 
             <div id="clockComponent" style="display:flex;flex-flow:row nowrap;justify-content:center;flex:0 1 auto;
             margin-bottom:10px;">
