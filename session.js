@@ -18,23 +18,26 @@ class Session {
     constructor(src, saveHandler = null) {
         this.saveHandler = saveHandler;
         this.saveName = `session-${pad(Math.floor(Math.random() * 1000), 4)}`;
+        this.isStored = false;
 
         if (typeof (src) === "string") {
             this.saveName = `session-${src}`;
             src = getCookie(this.saveName);
-            if (src === "") {
+            if (src == null) {
                 src = {};
             } else {
                 src = JSON.parse(src);
+                this.isStored = true;
             }
         }
+        //this.friendlyName = this.saveName;
 
-        let firstNoteValue = getCookie("markdown-note1");
-        if (firstNoteValue === "")
-            firstNoteValue = "Test ends at --:--";
-        let secondNoteValue = getCookie("markdown-note2");
-        if (secondNoteValue === "")
-            secondNoteValue = note2cont;
+        // let firstNoteValue = getCookie("markdown-note1");
+        // if (firstNoteValue === "")
+        //     firstNoteValue = "Test ends at --:--";
+        // let secondNoteValue = getCookie("markdown-note2");
+        // if (secondNoteValue === "")
+        //     secondNoteValue = note2cont;
 
         this.description = {
             clock: {
@@ -42,12 +45,12 @@ class Session {
             },
             notes: [
                 {
-                    markdown: firstNoteValue,
+                    markdown: "Test ends at --:--",
                     theme: "dark",
                     display: true
                 },
                 {
-                    markdown: secondNoteValue,
+                    markdown: defaultVoorbladNotes,
                     theme: "light",
                     display: true
                 }
@@ -76,6 +79,11 @@ class Session {
         for (let l of this.notes) {
             l.addSelf();
         }
+
+        this.friendlyName = friendlyNames[this.saveName] ?? this.friendlyName ?? this.saveName ?? "Untitled";
+
+        setCurrentSessionName(this.friendlyName);
+
         currPresent = this;
     }
 

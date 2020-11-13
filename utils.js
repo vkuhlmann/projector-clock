@@ -33,7 +33,7 @@ function getCookie(cname) {
             return window.atob(c.substring(name.length, c.length));
         }
     }
-    return "";
+    return null;
 }
 
 let instantiationIndex = 0;

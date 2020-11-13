@@ -12,17 +12,24 @@ let defaultVoorbladNotes = `\
 
 **Good luck!**`;
 
-let note2cont;
-
 let sess;
 let currPresent;
 
+let friendlyNames = {};
+
 function addSessionChoice(src, friendlyName) {
+    if (friendlyName == null) {
+        if (src instanceof Session)
+            friendlyName = friendlyNames[src?.saveName] ?? src?.saveName ?? "Untitled";
+        else
+            friendlyName = friendlyNames[src] ?? src;
+    }
+
     let el = htmlToElement(`\
-    <button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? "" : src}">
-        ${friendlyName}
-    </button>\
-    `);
+<button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? "" : src}">
+    ${friendlyName}
+</button>\
+`);
 
     $("#sessionSelections")[0].insertAdjacentElement("beforeend", el);
     el.addEventListener("click", function () {
@@ -44,6 +51,10 @@ function setSession(src) {
     sess = src;
     if (sess != null)
         sess.startPresent();
+}
+
+function setCurrentSessionName(n) {
+    $("#selectedSession")[0].innerText = n;
 }
 
 function onDOMReady() {
@@ -82,11 +93,24 @@ function onDOMReady() {
         }
     });
 
-    note2cont = getCookie("notes2");
-    let isOldCookieExists = note2cont !== "";
+    let legacyNotes2 = getCookie("notes2");
 
-    if (!isOldCookieExists)
-        note2cont = defaultVoorbladNotes;
+    if (legacyNotes2 != null) {
+        let legacySess = new Session("legacy1");
+        friendlyNames[legacySess.saveName] = "Legacy 1";
+        legacySess.notes = [Note.Create("Test ends at --:--", "dark"), Note.Create(legacyNotes2, "light")];
+        legacySess.save();
+    }
+
+    let legacyMarkdown1 = getCookie("markdown-note1");
+    let legacyMarkdown2 = getCookie("markdown-note2");
+
+    if (legacyMarkdown1 != null || legacyMarkdown2 != null) {
+        let legacySess = new Session("legacy2");
+        friendlyNames[legacySess.saveName] = "Legacy 2";
+        legacySess.notes = [Note.Create(legacyMarkdown1 ?? "Test ends at --:--", "dark"), Note.Create(legacyMarkdown2, "light")];
+        legacySess.save();
+    }
 
     //notes.push(new Note("note1", null, true, "Test ends at --:--"));
     //notes.push(new Note("note2", null, false, note2cont));
@@ -106,20 +130,27 @@ function onDOMReady() {
     //     setCookie("notes2", "", -1);
     // }
 
-    //debugger;
+    let demoSess = new Session("demo");
+    if (demoSess.isStored) {
+        friendlyNames[demoSess.saveName] = "Demo session";
+        addSessionChoice(demoSess);
+    }
+
     let sess1 = new Session("1");
     let sess2 = new Session("2");
     let sess3 = new Session("3");
-    sess1.notes = [Note.Create("Hey!"), Note.Create("Daar!")];
-    sess2.notes = [Note.Create("Hier maar een enkel kader.")];
+    sess2.notes = [Note.Create("Hey!"), Note.Create("Daar!")];
+    sess3.notes = [Note.Create("Hier maar een enkel kader.")];
 
-    addSessionChoice(sess1, "Session 1");
-    addSessionChoice(sess2, "Session 2");
-    addSessionChoice(sess3, "Session 3");
+    friendlyNames[sess1.saveName] = "Session 1";
+    friendlyNames[sess2.saveName] = "Session 2";
+    friendlyNames[sess3.saveName] = "Session 3";
 
-    sess = new Session("demo");
+    addSessionChoice(sess1);
+    addSessionChoice(sess2);
+    addSessionChoice(sess3);
 
-    sess.startPresent();
+    sess1.startPresent();
 
     updateClock();
     startClock();
