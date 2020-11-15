@@ -57,6 +57,29 @@ function setCurrentSessionName(n) {
     $("#selectedSession")[0].innerText = n;
 }
 
+function createSession() {
+    let num = 1;
+    let cookieNames = Session.GetAllCookieNames();
+
+    for (; num < 1000; num++) {
+        if (!(`session-${num}` in friendlyNames) && !(`session-${num}` in cookieNames))
+            break;
+    }
+
+    let newSession = new Session(`${num}`);
+
+    //    sess2.notes = [Note.Create("Hey!"), Note.Create("Daar!")];
+    //    sess3.notes = [Note.Create("Hier maar een enkel kader.")];
+
+    //    friendlyNames[sess1.saveName] = "Session 1";
+    //    friendlyNames[sess2.saveName] = "Session 2";
+    //    friendlyNames[sess3.saveName] = "Session 3";
+
+    friendlyNames[newSession.saveName] = `Session ${num}`;
+    addSessionChoice(newSession);
+    setSession(newSession);
+}
+
 function onDOMReady() {
     clockUpdateLoop = null;
     isShowSeconds = false;
@@ -149,6 +172,8 @@ function onDOMReady() {
     addSessionChoice(sess1);
     addSessionChoice(sess2);
     addSessionChoice(sess3);
+
+    $("#createSession").click(createSession);
 
     sess1.startPresent();
 

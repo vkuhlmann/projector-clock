@@ -66,8 +66,8 @@ class Session {
         for (let noteDesc of this.description.notes) {
             let a = new Note(noteDesc, false);
             this.notes.push(a);
-            a.onMajorEditListeners.push(function(name){session.handleMajorEdit(name)});
-            a.onMinorEditListeners.push(function(name){session.handleMinorEdit(name)});
+            a.onMajorEditListeners.push(function (name) { session.handleMajorEdit(name) });
+            a.onMinorEditListeners.push(function (name) { session.handleMinorEdit(name) });
         }
 
         // this.notes.push(Note.Create(firstNoteValue, "dark"));
