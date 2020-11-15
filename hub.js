@@ -12,7 +12,99 @@ let defaultVoorbladNotes = `\
 
 **Good luck!**`;
 
-let notes = [];
+let sess;
+let currPresent;
+
+let friendlyNames = {};
+let sessionList = [];
+
+function addSessionChoice(src, friendlyName = null) {
+    if (friendlyName == null) {
+        if (src instanceof Session)
+            friendlyName = friendlyNames[src?.saveName] ?? src?.saveName ?? "Untitled";
+        else
+            friendlyName = friendlyNames[src] ?? src;
+    }
+
+    let el = htmlToElement(`\
+<button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? "" : src}">
+    ${friendlyName}
+</button>\
+`);
+
+    $("#sessionSelections")[0].insertAdjacentElement("beforeend", el);
+    el.addEventListener("click", function () {
+        setSession(src);
+    });
+
+    //     $("#sessionSelections")[0].insertAdjacentHTML("beforeend",
+    //         `\
+    // <button class="dropdown-item" data-id="selectSession" data-value="${name}">
+    //     ${friendlyName}
+    // </button>`
+    //     );
+}
+
+function setSession(src) {
+    if (!(src instanceof Session))
+        src = new Session(src);
+
+    sess = src;
+    if (sess != null) {
+        sess.startPresent();
+        setCookie("lastSession", sess.saveName ?? "", 36500, true);
+    }
+}
+
+function setCurrentSessionName(n) {
+    $("#selectedSession")[0].innerText = n;
+}
+
+function createSession() {
+    let num = 1;
+    let cookieNames = Session.GetAllCookieNames();
+
+    for (; num < 1000; num++) {
+        if (!(`session-${num}` in friendlyNames) && !(cookieNames.includes(`session-${num}`)))
+            break;
+    }
+
+    let newSession = new Session(`session-${num}`);
+
+    //    sess2.notes = [Note.Create("Hey!"), Note.Create("Daar!")];
+    //    sess3.notes = [Note.Create("Hier maar een enkel kader.")];
+
+    //    friendlyNames[sess1.saveName] = "Session 1";
+    //    friendlyNames[sess2.saveName] = "Session 2";
+    //    friendlyNames[sess3.saveName] = "Session 3";
+
+    friendlyNames[newSession.saveName] = `Session ${num}`;
+    addSessionChoice(newSession);
+    setSession(newSession);
+
+    saveSessionList();
+}
+
+function saveSessionList() {
+    saveObject("sessionList", sessionList);
+    saveObject("friendlyNames", friendlyNames);
+}
+
+function loadSessionList() {
+    sessionList = loadObject("sessionList") ?? [];
+
+    Object.assign(friendlyNames, loadObject("friendlyNames") ?? {});
+
+    for (let cookieName of Session.GetAllCookieNames()) {
+        if (!(sessionList.includes(cookieName)))
+            sessionList.push(cookieName);
+        friendlyNames[cookieName] = friendlyNames[cookieName] ?? cookieName;
+    }
+
+    for (let s of sessionList) {
+        addSessionChoice(s);
+    }
+}
 
 function onDOMReady() {
     clockUpdateLoop = null;
@@ -29,37 +121,103 @@ function onDOMReady() {
                 e.preventDefault();
                 e.stopPropagation();
             } else if (e.key === "2") {
-                if (1 in notes) {
-                    notes[1].toggleVisible();
+                if (1 in sess.notes) {
+                    sess.notes[1].toggleVisible();
                     e.preventDefault();
                     e.stopPropagation();
                 }
 
             } else if (e.key === "1") {
-                if (0 in notes) {
-                    notes[0].toggleVisible();
+                if (0 in sess.notes) {
+                    sess.notes[0].toggleVisible();
                     e.preventDefault();
                     e.stopPropagation();
                 }
             } else if (e.key === "r") {
-                resetNotes();
+                sess.stopPresent();
+                //resetNotes();
+            } else if (e.key === "t") {
+                sess.startPresent();
             }
         }
     });
 
-    let note2cont = getCookie("notes2");
-    let isOldCookieExists = note2cont !== "";
+    //notes.push(new Note("note1", null, true, "Test ends at --:--"));
+    //notes.push(new Note("note2", null, false, note2cont));
 
-    if (!isOldCookieExists)
-        note2cont = defaultVoorbladNotes;
+    // let firstNoteValue = getCookie("markdown-note1");
+    // if (firstNoteValue === "")
+    //     firstNoteValue = "Test ends at --:--";
+    // let secondNoteValue = getCookie("markdown-note2");
+    // if (secondNoteValue === "")
+    //     secondNoteValue = note2cont;
 
-    notes.push(new Note("note1", null, true, "Test ends at --:--"));
-    notes.push(new Note("note2", null, false, note2cont));
+    // notes.push(Note.Create(firstNoteValue, "dark"));
+    // notes.push(Note.Create(secondNoteValue, "light"));
 
-    if (isOldCookieExists) {
-        notes[1].save();
-        setCookie("notes2", "", -1);
+    // if (isOldCookieExists) {
+    //     notes[1].save();
+    //     setCookie("notes2", "", -1);
+    // }
+
+    // let demoSess = new Session("session-demo");
+    // if (demoSess.isStored) {
+    //     friendlyNames[demoSess.saveName] = "Demo session";
+    //     addSessionChoice(demoSess);
+    // }
+
+    // let sess1 = new Session("session-1");
+    // // let sess2 = new Session("2");
+    // // let sess3 = new Session("3");
+    // // sess2.notes = [Note.Create("Hey!"), Note.Create("Daar!")];
+    // // sess3.notes = [Note.Create("Hier maar een enkel kader.")];
+
+    // friendlyNames[sess1.saveName] = "Session 1";
+    // // friendlyNames[sess2.saveName] = "Session 2";
+    // // friendlyNames[sess3.saveName] = "Session 3";
+
+    //addSessionChoice(sess1);
+    // addSessionChoice(sess2);
+    // addSessionChoice(sess3);
+
+    loadSessionList();
+
+    let legacyNotes2 = getCookie("notes2");
+
+    if (legacyNotes2 != null) {
+        let legacySess = new Session("session-legacy1");
+        friendlyNames[legacySess.saveName] = "Legacy 1";
+        legacySess.notes = [Note.Create("Test ends at --:--", "dark"), Note.Create(legacyNotes2, "light")];
+        legacySess.save();
     }
+
+    let legacyMarkdown1 = getCookie("markdown-note1");
+    let legacyMarkdown2 = getCookie("markdown-note2");
+
+    if (legacyMarkdown1 != null || legacyMarkdown2 != null) {
+        let legacySess = new Session("session-legacy2");
+        friendlyNames[legacySess.saveName] = "Legacy 2";
+        legacySess.notes = [Note.Create(legacyMarkdown1 ?? "Test ends at --:--", "dark"), Note.Create(legacyMarkdown2, "light")];
+        legacySess.save();
+    }
+
+    if (sessionList.length == 0)
+        createSession();
+
+    let lastSession = getCookie("lastSession");
+    if (lastSession != null && sessionList.includes(lastSession))
+        setSession(lastSession);
+    else
+        setSession(sessionList[0]);
+
+    if (sessionList.includes("session-demo"))
+        friendlyNames["session-demo"] = friendlyNames["session-demo"] ?? "Demo session";
+
+    saveSessionList();
+
+    $("#createSession").click(createSession);
+
+    //sess1.startPresent();
 
     updateClock();
     startClock();
