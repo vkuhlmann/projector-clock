@@ -21,7 +21,7 @@ class Session {
         this.isStored = false;
 
         if (typeof (src) === "string") {
-            this.saveName = `session-${src}`;
+            this.saveName = `${src}`;
             src = getCookie(this.saveName);
             if (src == null) {
                 src = {};
@@ -69,6 +69,9 @@ class Session {
             a.onMajorEditListeners.push(function (name) { session.handleMajorEdit(name) });
             a.onMinorEditListeners.push(function (name) { session.handleMinorEdit(name) });
         }
+
+        if (!sessionList.includes(this.saveName))
+            sessionList.push(this.saveName);
 
         // this.notes.push(Note.Create(firstNoteValue, "dark"));
         // notes.push(Note.Create(secondNoteValue, "light"));

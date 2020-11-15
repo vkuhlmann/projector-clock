@@ -9,17 +9,18 @@ function pad(num, size) {
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
 // Modified
-function setCookie(cname, cvalue, exdays) {
+function setCookie(cname, cvalue, exdays, plain = false) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toUTCString();
-    let cookieString = cname + "=" + window.btoa(cvalue) + ";" + expires + ";samesite=lax;path=/";
+    let cookieString = cname + "=" + (plain ? ("!" + cvalue) : window.btoa(cvalue)) + ";" + expires + ";samesite=lax;path=/";
     //console.log("setting cookie: " + cookieString);
     document.cookie = cookieString;
     //cname + "=" + cvalue + ";" + expires + ";SameSite:strict;path=/";
 }
 
 // Source: https://www.w3schools.com/js/js_cookies.asp
+// Modified
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -30,10 +31,26 @@ function getCookie(cname) {
         }
         if (c.indexOf(name) == 0) {
             //console.log("decoding " + c.substring(name.length, c.length));
-            return window.atob(c.substring(name.length, c.length));
+            let val = c.substring(name.length, c.length);
+            if (val.startsWith("!"))
+                return val.substring(1);
+            else
+                return window.atob(val);
         }
     }
     return null;
+}
+
+function saveObject(name, value, exdays = 36500) {
+    setCookie(name, JSON.stringify(value), exdays);
+}
+
+function loadObject(name) {
+    let v = getCookie(name);
+    if (v != null)
+        return JSON.parse(v);
+    else
+        return null;
 }
 
 let instantiationIndex = 0;
