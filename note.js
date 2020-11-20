@@ -81,6 +81,9 @@ class Note {
     removeSelf() {
         if (this.container == null)
             return;
+        if (this.isEditMode)
+            this.stopEdit();
+
         this.el.remove();
         this.container = null;
         //this.container.removeChild(this.el);

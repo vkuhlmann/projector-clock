@@ -124,6 +124,32 @@ function loadSessionList() {
     }
 }
 
+function deleteSession(session) {
+    if (!(session instanceof Session))
+        session = new Session(session);
+
+    removeSessionChoice(session);
+
+    //if (session instanceof Session)
+    if (currPresent === session)
+        session.stopPresent();
+
+    session.deleteCookie();
+    // sessionList = array.filter(function(value, index, arr) {
+    //     return value !== session.saveName;
+    // });
+    let sessionIndex = sessionList.findIndex((value) => value === session.saveName);
+    sessionList.splice(sessionIndex, 1);
+    delete friendlyNames[session.saveName];
+
+    if (sessionList.length == 0)
+        createSession();
+
+    if (currPresent == null)
+        setSession(sessionList[Math.min(sessionList.length - 1, sessionIndex)]);
+    saveSessionList();
+}
+
 function onFullscreenChange(event) {
     Toolbar.onFullsceenChange();
 }
@@ -156,11 +182,11 @@ function onDOMReady() {
                 e.preventDefault();
                 e.stopPropagation();
 
-            // } else if (e.key === "r") {
-            //     sess.stopPresent();
-            //     //resetNotes();
-            // } else if (e.key === "t") {
-            //     sess.startPresent();
+                // } else if (e.key === "r") {
+                //     sess.stopPresent();
+                //     //resetNotes();
+                // } else if (e.key === "t") {
+                //     sess.startPresent();
             } else if (e.key === "h") {
                 Toolbar.toggle();
                 e.preventDefault();

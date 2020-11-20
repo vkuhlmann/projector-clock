@@ -81,6 +81,10 @@ class Session {
         // notes.push(Note.Create(secondNoteValue, "light"));
     }
 
+    deleteCookie() {
+        setCookie(this.saveName, "", -1);
+    }
+
     createNote(noteDesc = null) {
         noteDesc = noteDesc ?? {
             markdown: "New note",

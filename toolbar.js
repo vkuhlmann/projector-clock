@@ -11,6 +11,10 @@ class Toolbar {
             Toolbar.toggle();
         });
 
+        $("#deleteSession").click(() => {
+            Toolbar.deleteCurrentSession();
+        });
+
         $("#toggleFullscreen").click(() => {
             Toolbar.toggleFullscreen();
         });
@@ -45,6 +49,10 @@ class Toolbar {
         } else {
             Toolbar.show();
         }
+    }
+
+    static deleteCurrentSession() {
+        deleteSession(sess);
     }
 
     static setNoteCount(count) {
