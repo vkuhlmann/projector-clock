@@ -63,11 +63,15 @@ class Session {
 
         const session = this;
 
+        // for (let noteDesc of this.description.notes) {
+        //     let a = new Note(noteDesc, false);
+        //     this.notes.push(a);
+        //     a.onMajorEditListeners.push(function (name) { session.handleMajorEdit(name) });
+        //     a.onMinorEditListeners.push(function (name) { session.handleMinorEdit(name) });
+        // }
+
         for (let noteDesc of this.description.notes) {
-            let a = new Note(noteDesc, false);
-            this.notes.push(a);
-            a.onMajorEditListeners.push(function (name) { session.handleMajorEdit(name) });
-            a.onMinorEditListeners.push(function (name) { session.handleMinorEdit(name) });
+            this.createNote(noteDesc);
         }
 
         if (!sessionList.includes(this.saveName))
@@ -75,6 +79,21 @@ class Session {
 
         // this.notes.push(Note.Create(firstNoteValue, "dark"));
         // notes.push(Note.Create(secondNoteValue, "light"));
+    }
+
+    createNote(noteDesc = null) {
+        noteDesc = noteDesc ?? {
+            markdown: "New note",
+            theme: "dark",
+            display: true
+        };
+
+        const session = this;
+
+        let a = new Note(noteDesc, currPresent === this);
+        this.notes.push(a);
+        a.onMajorEditListeners.push(function (name) { session.handleMajorEdit(name) });
+        a.onMinorEditListeners.push(function (name) { session.handleMinorEdit(name) });
     }
 
     startPresent() {
@@ -97,6 +116,23 @@ class Session {
             }
             currPresent = null;
         }
+    }
+
+    getNote(id) {
+        let index = id - 1;
+        return sess.notes[index];
+    }
+
+    toggleNote(id) {
+        let index = id - 1;
+        if (index in sess.notes) {
+            sess.notes[index].toggleVisible();
+            return true;
+        }
+
+        this.createNote();
+        return true;
+        //return false;
     }
 
     getDescription() {

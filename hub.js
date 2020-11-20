@@ -147,22 +147,15 @@ function onDOMReady() {
         if (currentEditNote == null) {
             if (e.key === "f") {
                 Toolbar.toggleFullscreen();
-                // $("body")[0].requestFullscreen();
-                // e.preventDefault();
-                // e.stopPropagation();
-            } else if (e.key === "2") {
-                if (1 in sess.notes) {
-                    sess.notes[1].toggleVisible();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
+                e.preventDefault();
+                e.stopPropagation();
 
-            } else if (e.key === "1") {
-                if (0 in sess.notes) {
-                    sess.notes[0].toggleVisible();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
+            } else if (e.key.length == 1 && e.key.charAt(0) >= "1" && e.key.charAt(0) <= "9") {
+                let id = (e.key.charAt(0) - "1") + 1;
+                sess.toggleNote(id);
+                e.preventDefault();
+                e.stopPropagation();
+
             // } else if (e.key === "r") {
             //     sess.stopPresent();
             //     //resetNotes();
