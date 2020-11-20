@@ -5,6 +5,7 @@ class Toolbar {
         Toolbar.isVisible = true;
         Toolbar.isFullscreen = false;
         Toolbar.el = $("#toolbar")[0];
+        Toolbar.noteCount = 0;
 
         $("#toggletoolbar").click(() => {
             Toolbar.toggle();
@@ -12,6 +13,19 @@ class Toolbar {
 
         $("#toggleFullscreen").click(() => {
             Toolbar.toggleFullscreen();
+        });
+
+        $("#toggleNote1").click(() => {
+            sess.toggleNote(1);
+        });
+
+        $("#toggleNote2").click(() => {
+            sess.toggleNote(2);
+        });
+
+        $("#createNote").click(() => {
+            if (Toolbar.noteCount < 9)
+                sess.toggleNote(9);
         });
     }
 
@@ -31,6 +45,15 @@ class Toolbar {
         } else {
             Toolbar.show();
         }
+    }
+
+    static setNoteCount(count) {
+        Toolbar.noteCount = count;
+        let el = $("#createNoteButtonLabel")[0];
+        if (count < 9)
+            el.innerText = `Create note (${count + 1})`;
+        else
+            el.innerText = `[Max notes reached]`;
     }
 
     static onFullsceenChange() {

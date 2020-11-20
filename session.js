@@ -94,6 +94,8 @@ class Session {
         this.notes.push(a);
         a.onMajorEditListeners.push(function (name) { session.handleMajorEdit(name) });
         a.onMinorEditListeners.push(function (name) { session.handleMinorEdit(name) });
+
+        Toolbar.setNoteCount(this.notes.length);
     }
 
     startPresent() {
@@ -105,6 +107,7 @@ class Session {
         this.friendlyName = friendlyNames[this.saveName] ?? this.friendlyName ?? this.saveName ?? "Untitled";
 
         setCurrentSessionName(this.friendlyName);
+        Toolbar.setNoteCount(this.notes.length);
 
         currPresent = this;
     }
