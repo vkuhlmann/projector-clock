@@ -12,8 +12,9 @@ the students preferred this big digital clock. I provided useful information usi
 in the new session template. Click notes to edit them.
 
 Available keyboard functions:
-- [1]: show/hide short note
-- [2]: show/hide long note
+- [1]: show/hide first note
+- [2]: show/hide second note
+- [1..9]: show/hide #-th note
 - [h]: show/hide help toolbar
 - [f] or browser-specific [F11]: fullscreen
 
