@@ -17,11 +17,12 @@ Available keyboard functions:
 - [f] or browser-specific [F11]: fullscreen
 
 Things I would still like to add when I've a bit of time:
-- Allow clock font size change.
+- Add clock font size changing.
 - Auto-hide help toolbar after a couple of seconds.
-- Allow note font size change.
-- Add dual column layout.
-- Rename sessions.
-- Delete and rename sessions from within the dropdown.
-- Automatically adapt font to fit contents in screen.
-- Editing in one browser window, and pushing it automatically to another browser window.
+- Add session duplication and overwriting.
+- Add note font size changing.
+- Add option for dual column layout.
+- Add session renaming.
+- Allow session delete and rename from within the dropdown.
+- Add option to have font size auto adapt to fit all contents in the screen.
+- Add frequent check for cookie updates, so you can edit in one browser window, and by overwriting the session of another browser window, the changes will appear seamlessly in your presenting browser window.
