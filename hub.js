@@ -124,6 +124,14 @@ function loadSessionList() {
     }
 }
 
+function onFullscreenChange(event) {
+    Toolbar.onFullsceenChange();
+}
+
+function onFullscreenError(event) {
+    alert("Browser doesn't allow switching into fullscreen =/");
+}
+
 function onDOMReady() {
     clockUpdateLoop = null;
     isShowSeconds = false;
@@ -132,12 +140,16 @@ function onDOMReady() {
     //clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
     //clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
 
+    document.onfullscreenchange = onFullscreenChange;
+    document.onfullscreenerror = onFullscreenError;
+
     $("body")[0].addEventListener("keydown", function (e) {
         if (currentEditNote == null) {
             if (e.key === "f") {
-                $("body")[0].requestFullscreen();
-                e.preventDefault();
-                e.stopPropagation();
+                Toolbar.toggleFullscreen();
+                // $("body")[0].requestFullscreen();
+                // e.preventDefault();
+                // e.stopPropagation();
             } else if (e.key === "2") {
                 if (1 in sess.notes) {
                     sess.notes[1].toggleVisible();
