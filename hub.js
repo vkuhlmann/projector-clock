@@ -27,7 +27,7 @@ function addSessionChoice(src, friendlyName = null) {
     }
 
     let el = htmlToElement(`\
-<button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? "" : src}">
+<button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? src.saveName : src}">
     ${friendlyName}
 </button>\
 `);
@@ -43,6 +43,23 @@ function addSessionChoice(src, friendlyName = null) {
     //     ${friendlyName}
     // </button>`
     //     );
+}
+
+function removeSessionChoice(src) {
+    if (src instanceof Session)
+        src = src.saveName;
+    let el = $(`#sessionSelections [data-id=\"selectSession\"][data-value=\"${src}\"]`).toArray();
+    if (el.length == 0)
+        return false;
+    el[0].remove();
+    return true;
+}
+
+function removeAllSessionChoices() {
+    let els = $(`#sessionSelections [data-id=\"selectSession\"]`).toArray();
+    for (let el of els) {
+        el.remove();
+    }
 }
 
 function setSession(src) {
@@ -101,9 +118,44 @@ function loadSessionList() {
         friendlyNames[cookieName] = friendlyNames[cookieName] ?? cookieName;
     }
 
+    removeAllSessionChoices();
     for (let s of sessionList) {
         addSessionChoice(s);
     }
+}
+
+function deleteSession(session) {
+    if (!(session instanceof Session))
+        session = new Session(session);
+
+    removeSessionChoice(session);
+
+    //if (session instanceof Session)
+    if (currPresent === session)
+        session.stopPresent();
+
+    session.deleteCookie();
+    // sessionList = array.filter(function(value, index, arr) {
+    //     return value !== session.saveName;
+    // });
+    let sessionIndex = sessionList.findIndex((value) => value === session.saveName);
+    sessionList.splice(sessionIndex, 1);
+    delete friendlyNames[session.saveName];
+
+    if (sessionList.length == 0)
+        createSession();
+
+    if (currPresent == null)
+        setSession(sessionList[Math.min(sessionList.length - 1, sessionIndex)]);
+    saveSessionList();
+}
+
+function onFullscreenChange(event) {
+    Toolbar.onFullsceenChange();
+}
+
+function onFullscreenError(event) {
+    alert("Browser doesn't allow switching into fullscreen =/");
 }
 
 function onDOMReady() {
@@ -114,30 +166,31 @@ function onDOMReady() {
     //clockEvents["13:32:00"] = function () { hideVoorbladNotes(); };
     //clockEvents["22:00:00"] = function () { showVoorbladNotes(); };
 
+    document.onfullscreenchange = onFullscreenChange;
+    document.onfullscreenerror = onFullscreenError;
+
     $("body")[0].addEventListener("keydown", function (e) {
         if (currentEditNote == null) {
             if (e.key === "f") {
-                $("body")[0].requestFullscreen();
+                Toolbar.toggleFullscreen();
                 e.preventDefault();
                 e.stopPropagation();
-            } else if (e.key === "2") {
-                if (1 in sess.notes) {
-                    sess.notes[1].toggleVisible();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
 
-            } else if (e.key === "1") {
-                if (0 in sess.notes) {
-                    sess.notes[0].toggleVisible();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            } else if (e.key === "r") {
-                sess.stopPresent();
-                //resetNotes();
-            } else if (e.key === "t") {
-                sess.startPresent();
+            } else if (e.key.length == 1 && e.key.charAt(0) >= "1" && e.key.charAt(0) <= "9") {
+                let id = (e.key.charAt(0) - "1") + 1;
+                sess.toggleNote(id);
+                e.preventDefault();
+                e.stopPropagation();
+
+                // } else if (e.key === "r") {
+                //     sess.stopPresent();
+                //     //resetNotes();
+                // } else if (e.key === "t") {
+                //     sess.startPresent();
+            } else if (e.key === "h") {
+                Toolbar.toggle();
+                e.preventDefault();
+                e.stopPropagation();
             }
         }
     });
@@ -181,6 +234,7 @@ function onDOMReady() {
     // addSessionChoice(sess3);
 
     loadSessionList();
+    let reloadSessions = false;
 
     let legacyNotes2 = getCookie("notes2");
 
@@ -189,6 +243,7 @@ function onDOMReady() {
         friendlyNames[legacySess.saveName] = "Legacy 1";
         legacySess.notes = [Note.Create("Test ends at --:--", "dark"), Note.Create(legacyNotes2, "light")];
         legacySess.save();
+        reloadSessions = true;
     }
 
     let legacyMarkdown1 = getCookie("markdown-note1");
@@ -199,6 +254,7 @@ function onDOMReady() {
         friendlyNames[legacySess.saveName] = "Legacy 2";
         legacySess.notes = [Note.Create(legacyMarkdown1 ?? "Test ends at --:--", "dark"), Note.Create(legacyMarkdown2, "light")];
         legacySess.save();
+        reloadSessions = true;
     }
 
     if (sessionList.length == 0)
@@ -214,6 +270,8 @@ function onDOMReady() {
         friendlyNames["session-demo"] = friendlyNames["session-demo"] ?? "Demo session";
 
     saveSessionList();
+    if (reloadSessions)
+        loadSessionList();
 
     $("#createSession").click(createSession);
 
@@ -221,4 +279,6 @@ function onDOMReady() {
 
     updateClock();
     startClock();
+
+    Toolbar.init();
 }
