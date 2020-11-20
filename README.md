@@ -22,6 +22,7 @@ Things I would still like to add when I've a bit of time:
 - Add clock font size changing.
 - Auto-hide help toolbar after a couple of seconds.
 - Add session duplication and overwriting.
+- Add seconds toggle.
 - Add note font size changing.
 - Add option for dual column layout.
 - Add session renaming.
