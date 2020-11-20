@@ -27,7 +27,7 @@ function addSessionChoice(src, friendlyName = null) {
     }
 
     let el = htmlToElement(`\
-<button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? "" : src}">
+<button class="dropdown-item" data-id="selectSession" data-value="${(src instanceof Session) ? src.saveName : src}">
     ${friendlyName}
 </button>\
 `);
@@ -43,6 +43,23 @@ function addSessionChoice(src, friendlyName = null) {
     //     ${friendlyName}
     // </button>`
     //     );
+}
+
+function removeSessionChoice(src) {
+    if (src instanceof Session)
+        src = src.saveName;
+    let el = $(`#sessionSelections [data-id=\"selectSession\"][data-value=\"${src}\"]`).toArray();
+    if (el.length == 0)
+        return false;
+    el[0].remove();
+    return true;
+}
+
+function removeAllSessionChoices() {
+    let els = $(`#sessionSelections [data-id=\"selectSession\"]`).toArray();
+    for (let el of els) {
+        el.remove();
+    }
 }
 
 function setSession(src) {
@@ -101,6 +118,7 @@ function loadSessionList() {
         friendlyNames[cookieName] = friendlyNames[cookieName] ?? cookieName;
     }
 
+    removeAllSessionChoices();
     for (let s of sessionList) {
         addSessionChoice(s);
     }
@@ -181,6 +199,7 @@ function onDOMReady() {
     // addSessionChoice(sess3);
 
     loadSessionList();
+    let reloadSessions = false;
 
     let legacyNotes2 = getCookie("notes2");
 
@@ -189,6 +208,7 @@ function onDOMReady() {
         friendlyNames[legacySess.saveName] = "Legacy 1";
         legacySess.notes = [Note.Create("Test ends at --:--", "dark"), Note.Create(legacyNotes2, "light")];
         legacySess.save();
+        reloadSessions = true;
     }
 
     let legacyMarkdown1 = getCookie("markdown-note1");
@@ -199,6 +219,7 @@ function onDOMReady() {
         friendlyNames[legacySess.saveName] = "Legacy 2";
         legacySess.notes = [Note.Create(legacyMarkdown1 ?? "Test ends at --:--", "dark"), Note.Create(legacyMarkdown2, "light")];
         legacySess.save();
+        reloadSessions = true;
     }
 
     if (sessionList.length == 0)
@@ -214,6 +235,8 @@ function onDOMReady() {
         friendlyNames["session-demo"] = friendlyNames["session-demo"] ?? "Demo session";
 
     saveSessionList();
+    if (reloadSessions)
+        loadSessionList();
 
     $("#createSession").click(createSession);
 
