@@ -8,7 +8,8 @@ for the students taking the exam.
 **Don't forget to enter fullscreen for the full minimalism, non-distraction effect!**
 
 I've used it in a couple of proctoring sessions, and even in a room where the clock was visible enough,
-the students preferred this big digital clock. You can click on the long note to edit its content.
+the students preferred this big digital clock. I provided useful information using the notes, as demonstrated
+in the new session template. Click notes to edit them.
 
 Available keyboard functions:
 - [1]: show/hide short note
