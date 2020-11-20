@@ -151,11 +151,15 @@ function onDOMReady() {
                     e.preventDefault();
                     e.stopPropagation();
                 }
-            } else if (e.key === "r") {
-                sess.stopPresent();
-                //resetNotes();
-            } else if (e.key === "t") {
-                sess.startPresent();
+            // } else if (e.key === "r") {
+            //     sess.stopPresent();
+            //     //resetNotes();
+            // } else if (e.key === "t") {
+            //     sess.startPresent();
+            } else if (e.key === "h") {
+                Toolbar.toggle();
+                e.preventDefault();
+                e.stopPropagation();
             }
         }
     });
@@ -244,4 +248,6 @@ function onDOMReady() {
 
     updateClock();
     startClock();
+
+    Toolbar.init();
 }
