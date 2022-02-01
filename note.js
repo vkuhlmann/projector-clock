@@ -154,7 +154,7 @@ class Note {
 
     setRaw(val, save = true) {
         try {
-            let newDisplay = marked(val);
+            let newDisplay = marked.parse(val);
             this.edit.raw.value = val;
             this.display.raw = this.edit.raw.value;
             this.display.el.innerHTML = newDisplay;
